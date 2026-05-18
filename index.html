@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tomášův režimový dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="topbar" aria-label="Hlavní navigace">
+        <strong>Tomášův dashboard</strong>
+        <div>
+          <a href="#trenink">Trénink</a>
+          <a href="#jidlo">Jídlo</a>
+          <a href="#nakup">Nákup</a>
+          <a href="#suplementace">Suplementace</a>
+          <a href="#checkin">Check-in</a>
+        </div>
+      </nav>
+      <div class="hero-grid">
+        <section>
+          <p class="eyebrow">8 až 12 týdnů tělesné rekompozice</p>
+          <h1>Tělo nepotřebuje bič. Potřebuje systém.</h1>
+          <p>
+            Cíl je zhubnout přebytečný tuk, držet sílu, zlepšit regeneraci,
+            spánek, HRV a dlouhodobě snížit klidový tep. Žádné drastické hubnutí,
+            ale chytrý týdenní rytmus.
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#checkin">Zapsat pondělní check-in</a>
+            <a class="button secondary" href="#plan">Zobrazit týden</a>
+          </div>
+        </section>
+        <aside class="hero-panel">
+          <span class="pill neutral">Výchozí stav</span>
+          <div class="target-number">81 až 82 kg</div>
+          <p>Aktuální váha, orientačně 14 až 15 % tuku.</p>
+          <div class="mini-progress">
+            <span>Primární cíl 79 až 80 kg</span>
+            <div><i style="width: 62%"></i></div>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Aktuální hodnoty</p>
+          <h2>Kontrolky režimu</h2>
+        </div>
+        <div id="metrics" class="metrics-grid"></div>
+      </section>
+
+      <section class="section goals" id="plan">
+        <div class="section-heading">
+          <p class="eyebrow">Směr na 8 až 12 týdnů</p>
+          <h2>Cíl není menší tělo, ale lepší systém</h2>
+        </div>
+        <div class="goal-grid">
+          <article class="card">
+            <span class="pill good">Realistický cíl</span>
+            <h3>79 až 80 kg, pas dolů o 2 až 4 cm</h3>
+            <p>Zachovat sílu, stabilizovat HRV, držet energii a nepřidávat intenzitu jen proto, že zrovna zbylo místo v kalendáři.</p>
+          </article>
+          <article class="card">
+            <span class="pill warn">Ambiciózní cíl</span>
+            <h3>77 až 78 kg jen při dobré odezvě těla</h3>
+            <p>Jít níž dává smysl pouze tehdy, pokud neklesá výkon, chuť do tréninku, spánek ani regenerace.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="trenink">
+        <div class="section-heading">
+          <p class="eyebrow">Týdenní plán tréninku</p>
+          <h2>Dny mají různé role</h2>
+        </div>
+        <div id="dayTabs" class="tabs" role="tablist"></div>
+        <div id="dayDetail" class="day-detail"></div>
+      </section>
+
+      <section class="section" id="jidlo">
+        <div class="section-heading">
+          <p class="eyebrow">Týdenní jídelní plán</p>
+          <h2>16:8, tři jídla, dost bílkovin</h2>
+        </div>
+        <div class="nutrition-strip">
+          <div><strong>120 až 150 g</strong><span>bílkovin denně</span></div>
+          <div><strong>11:30 až 20:00</strong><span>běžné okno jídla</span></div>
+          <div><strong>3 jídla</strong><span>oběd, svačina, večeře</span></div>
+        </div>
+        <div id="mealGrid" class="meal-grid"></div>
+      </section>
+
+      <section class="section" id="nakup">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Nákupní seznam</p>
+            <h2>Věci, které drží plán při zemi</h2>
+          </div>
+          <button id="clearShopping" class="button secondary" type="button">Odškrtnout vše</button>
+        </div>
+        <div class="shopping-layout">
+          <article class="card shopping-panel">
+            <div class="shopping-toolbar">
+              <div id="shoppingFilters" class="filters"></div>
+              <p id="shoppingSummary" class="muted-text"></p>
+            </div>
+            <div id="shoppingList" class="shopping-list"></div>
+          </article>
+          <aside class="card shopping-add-card">
+            <span class="pill good">Vlastní položka</span>
+            <h3>Přidat do pravidelného nákupu</h3>
+            <form id="shoppingForm" class="shopping-form">
+              <label>Název<input name="name" required placeholder="např. rajčata, kefír, šunka" /></label>
+              <label>Kategorie
+                <select name="category" required></select>
+              </label>
+              <label>Množství<input name="amount" placeholder="např. 2 balení, 1 kg" /></label>
+              <label>Poznámka<input name="note" placeholder="k čemu se hodí" /></label>
+              <button class="button primary" type="submit">Přidat položku</button>
+            </form>
+            <p class="muted-text">Seznam je organizační. Když se mění týden, odškrtni vše a jedeš znovu čistě.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section" id="recepty">
+        <div class="section-heading">
+          <p class="eyebrow">Receptová složka</p>
+          <h2>Rychlá rozhodnutí bez ořechů</h2>
+        </div>
+        <div id="recipeFilters" class="filters"></div>
+        <div id="recipeGrid" class="recipe-grid"></div>
+      </section>
+
+      <section class="section" id="suplementace">
+        <div class="section-heading supplement-heading">
+          <div>
+            <p class="eyebrow">Suplementace</p>
+            <h2>Organizační přehled, ne lékařské doporučení</h2>
+          </div>
+          <div class="visibility-toggles" aria-label="Zobrazení detailů suplementace">
+            <label class="toggle-row">
+              <input id="toggleSupplementDaily" type="checkbox" />
+              <span>Denní checklist</span>
+            </label>
+            <label class="toggle-row">
+              <input id="toggleSupplementWeekly" type="checkbox" />
+              <span>Adherence 7 dní</span>
+            </label>
+          </div>
+        </div>
+        <div id="supplementDailySection" class="supplement-shell is-hidden">
+          <article class="card supplement-day-card">
+            <div class="supplement-toolbar">
+              <div>
+                <span class="pill neutral">Přehled dne</span>
+                <h3>Co si dnes vzít</h3>
+              </div>
+              <label class="compact-label">Den
+                <select id="supplementDaySelect"></select>
+              </label>
+            </div>
+            <p id="supplementDaySummary" class="muted-text"></p>
+            <div id="supplementChecklist" class="supplement-checklist"></div>
+          </article>
+          <aside class="card supplement-alerts">
+            <span class="pill alert">Hlídat kombinace</span>
+            <ul class="clean-list">
+              <li>D3 + K2 a omega 3 kontroluj, pokud omega 3 obsahují také vitamin D nebo vitamin A.</li>
+              <li>Více druhů hořčíku se sčítá. Sleduj celkový denní příjem elementárního hořčíku.</li>
+              <li>Calcium, hořčík a zinek nedávej ideálně všechny najednou.</li>
+              <li>U dlouhodobé suplementace dává smysl kontrola vitaminu D, B12, železa a dalších hodnot.</li>
+            </ul>
+          </aside>
+        </div>
+
+        <div class="section-heading supplement-subheading">
+          <div>
+            <p class="eyebrow">Suplementy podle cíle</p>
+            <h2>Karty a nastavení</h2>
+          </div>
+        </div>
+        <div id="supplementFilters" class="filters"></div>
+        <div id="supplementGrid" class="supplement-grid"></div>
+
+        <div id="supplementWeeklyHeading" class="section-heading supplement-subheading is-hidden">
+          <div>
+            <p class="eyebrow">Týdenní přehled</p>
+            <h2>Adherence posledních 7 dní</h2>
+          </div>
+        </div>
+        <div id="supplementWeekly" class="supplement-weekly is-hidden"></div>
+      </section>
+
+      <section class="section two-column">
+        <article class="card accent-card">
+          <span class="pill warn">Alergické období</span>
+          <h2>Alergie a chutě na sladké</h2>
+          <p>
+            Když je tělo zatížené alergií, může být horší spánek a silnější chutě.
+            Nejde jen o slabou vůli. Sladké proto nezakazuj, ale řiď.
+          </p>
+          <ul class="clean-list">
+            <li>Nejdřív voda nebo čaj.</li>
+            <li>Potom skyr, tvaroh, kefír nebo proteinová varianta.</li>
+            <li>Až pak řeš, jestli jde o hlad, únavu nebo návyk.</li>
+          </ul>
+        </article>
+        <article class="card recovery-card">
+          <span class="pill recovery">Regenerace a HRV</span>
+          <h2>Pravidla, která chrání výkon</h2>
+          <ul class="clean-list">
+            <li>Cíl spánku 7 h 45 min až 8 h, ideálně usínat 22:00 až 22:30.</li>
+            <li>Po 21:00 omez práci, těžké jídlo, sladké a zbytečné obrazovky.</li>
+            <li>Čtvrtek je opravdu volnější den, ne mezera v plánu.</li>
+            <li>Když HRV klesá, tep roste a nohy jsou těžké, škrtni doplňkový běh.</li>
+            <li>Alkohol drž výjimečně, HRV a klidový tep ho poznají rychle.</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="section" id="checkin">
+        <div class="section-heading">
+          <p class="eyebrow">Pondělní check-in</p>
+          <h2>Krátká zpětná vazba pro další týden</h2>
+        </div>
+        <div class="checkin-layout">
+          <form id="checkinForm" class="card form-card">
+            <div class="form-grid">
+              <label>Váha kg<input name="weight" type="number" step="0.1" required /></label>
+              <label>Pas cm<input name="waist" type="number" step="0.1" required /></label>
+              <label>HRV 7 dní ms<input name="hrv" type="number" step="1" required /></label>
+              <label>Klidový tep<input name="rhr" type="number" step="1" required /></label>
+              <label>Spánek h<input name="sleep" type="number" step="0.1" required /></label>
+              <label>Energie 1 až 10<input name="energy" type="number" min="1" max="10" required /></label>
+              <label>Chutě 1 až 10<input name="cravings" type="number" min="1" max="10" required /></label>
+              <label>Datum<input name="date" type="date" required /></label>
+            </div>
+            <label>Poznámka k týdnu<textarea name="note" rows="3" placeholder="Co fungovalo, co ubrat, co pohlídat?"></textarea></label>
+            <button class="button primary" type="submit">Uložit check-in</button>
+          </form>
+          <aside class="card recommendation-card">
+            <span class="pill neutral">Doporučení</span>
+            <div id="evaluation">Zadej nový check-in a tady se objeví jednoduché vyhodnocení.</div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Historie měření</p>
+            <h2>Trend je důležitější než jeden den</h2>
+          </div>
+          <button id="clearHistory" class="button danger" type="button">Smazat historii</button>
+        </div>
+        <div class="history-wrap">
+          <canvas id="trendChart" width="900" height="260" aria-label="Graf vývoje"></canvas>
+          <div class="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Datum</th>
+                  <th>Váha</th>
+                  <th>Pas</th>
+                  <th>HRV</th>
+                  <th>Tep</th>
+                  <th>Spánek</th>
+                  <th>Energie</th>
+                  <th>Chutě</th>
+                  <th>Poznámka</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="section final-note">
+        <span class="pill good">Další týden</span>
+        <h2 id="nextWeekTitle">Drž plán, ne ego</h2>
+        <p id="nextWeekAdvice">Síla 3× týdně, fotbal počítat jako tvrdý trénink, čtvrtek chránit a sladké řešit řízeně.</p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
