@@ -1,12 +1,12 @@
 const metrics = [
-  ["Váha", "81 až 82 kg", "Výchozí stav, cíl není padat rychle."],
-  ["Tělesný tuk", "14 až 15 %", "Chytrá váha je orientační, sleduj trend."],
-  ["Klidový tep", "55 bpm", "Roční průměr, dobrý ukazatel regenerace."],
-  ["HRV", "34 až 36 ms", "Stabilita je teď důležitější než rekord."],
-  ["Kroky", "12 810 / den", "Silný základ, ve čtvrtek vědomě ubrat."],
-  ["Spánek", "7 h 20 min", "Cíl posunout blíž k 7 h 45 min až 8 h."],
-  ["Body Battery", "80 až 90", "Ranní stav většinou solidní."],
-  ["Stres", "27 / 25", "4 týdny / rok, alergie může dočasně přidat zátěž."]
+  ["Váha", "81 až 82 kg", "Zůstává orientační, přesnou váhu doplníš při pondělním check-inu."],
+  ["Tělesný tuk", "14 až 15 %", "Zůstává orientační z chytré váhy, sleduj hlavně trend."],
+  ["Srdeční tep", "56 bpm", "Průměr ze screenshotů 22. 5. až 28. 5.; roční klidový tep byl 55 bpm."],
+  ["HRV", "40 ms", "Aktuální 7denní stav VST, noční průměr týdne cca 41 ms."],
+  ["Kroky", "14 725 / den", "98 231 kroků za týden, celkem 78,4 km."],
+  ["Spánek", "7 h 13 min", "Průměr 22. 5. až 28. 5.; cíl zůstává 7 h 45 min až 8 h."],
+  ["Body Battery", "80 až 90", "Tady zatím nemáme nový screenshot, nechávám původní orientační stav."],
+  ["Stres", "22", "Průměr ze screenshotů 22. 5. až 28. 5.; lepší než původní 4týdenní průměr 27."]
 ];
 
 const garminReports = [
