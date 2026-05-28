@@ -781,6 +781,8 @@ const supplementLogKey = "tomasSupplementLogV2";
 const supplementVisibilityKey = "tomasSupplementVisibilityV2";
 const shoppingStateKey = "tomasShoppingStateV2";
 const customShoppingKey = "tomasCustomShoppingV2";
+const plannedShoppingStateKey = "tomasPlannedShoppingStateV1";
+const plannedShoppingVisibilityKey = "tomasPlannedShoppingVisibilityV1";
 const recipesVisibilityKey = "tomasRecipesVisibilityV1";
 const $ = (selector) => document.querySelector(selector);
 
@@ -1114,6 +1116,31 @@ function getShoppingItems() {
   return [...baseShoppingItems, ...getCustomShoppingItems()];
 }
 
+function getPlannedShoppingState() {
+  return JSON.parse(localStorage.getItem(plannedShoppingStateKey) || "{}");
+}
+
+function savePlannedShoppingState(state) {
+  localStorage.setItem(plannedShoppingStateKey, JSON.stringify(state));
+}
+
+function getPlannedShoppingKey(week) {
+  return `week-${week.title}`;
+}
+
+function applyPlannedShoppingVisibility() {
+  const visible = localStorage.getItem(plannedShoppingVisibilityKey) === "true";
+  $("#togglePlannedShopping").checked = visible;
+  $("#plannedShoppingSection").classList.toggle("is-hidden", !visible);
+}
+
+function bindPlannedShoppingVisibility() {
+  $("#togglePlannedShopping").addEventListener("change", (event) => {
+    localStorage.setItem(plannedShoppingVisibilityKey, String(event.target.checked));
+    applyPlannedShoppingVisibility();
+  });
+}
+
 function renderShoppingFilters(active = "Vše") {
   $("#shoppingFilters").innerHTML = shoppingCategories.map((category) => `
     <button class="filter ${category === active ? "active" : ""}" type="button" data-shopping-category="${category}">${category}</button>
@@ -1263,7 +1290,11 @@ function renderNextWeekShoppingList() {
   if (!target || !summary) return;
 
   const { week, items } = buildNextWeekShoppingList();
-  summary.textContent = `${week.title}. Vygenerováno z obědů, svačin a večeří v rotaci.`;
+  const state = getPlannedShoppingState();
+  const weekKey = getPlannedShoppingKey(week);
+  const checked = state[weekKey] || {};
+  const checkedCount = items.filter((item) => checked[item.id]).length;
+  summary.textContent = `${week.title}. Odškrtnuto ${checkedCount}/${items.length}. Vygenerováno z obědů, svačin a večeří v rotaci.`;
 
   target.innerHTML = shoppingCategories
     .filter((category) => category !== "Vše")
@@ -1275,14 +1306,15 @@ function renderNextWeekShoppingList() {
           <h4>${category}</h4>
           <div>
             ${categoryItems.map((item) => `
-              <article class="next-shopping-item">
-                <div>
+              <label class="next-shopping-item ${checked[item.id] ? "done" : ""}">
+                <input type="checkbox" data-planned-shopping-id="${item.id}" ${checked[item.id] ? "checked" : ""} />
+                <span>
                   <strong>${item.name}</strong>
                   <small>${item.amount || "dle potřeby"} · ${item.frequency || "průběžně"} · ${item.count}× v plánu</small>
-                </div>
-                <p>${item.note || ""}</p>
-                <em>${item.uses.slice(0, 2).join("<br>")}${item.uses.length > 2 ? "<br>+ další jídla v týdnu" : ""}</em>
-              </article>
+                  <p>${item.note || ""}</p>
+                  <em>${item.uses.slice(0, 2).join("<br>")}${item.uses.length > 2 ? "<br>+ další jídla v týdnu" : ""}</em>
+                </span>
+              </label>
             `).join("")}
           </div>
         </section>
@@ -1299,6 +1331,8 @@ function initShopping() {
 
   renderShoppingFilters();
   renderNextWeekShoppingList();
+  applyPlannedShoppingVisibility();
+  bindPlannedShoppingVisibility();
   $("#shoppingFilters").addEventListener("click", (event) => {
     const button = event.target.closest("button");
     if (button) renderShoppingFilters(button.dataset.shoppingCategory);
@@ -1312,10 +1346,26 @@ function initShopping() {
     const activeFilter = $("#shoppingFilters .active")?.dataset.shoppingCategory || "Vše";
     renderShoppingList(activeFilter);
   });
+  $("#nextWeekShoppingList").addEventListener("change", (event) => {
+    const input = event.target.closest("input[data-planned-shopping-id]");
+    if (!input) return;
+    const { week } = buildNextWeekShoppingList();
+    const weekKey = getPlannedShoppingKey(week);
+    const state = getPlannedShoppingState();
+    state[weekKey] = state[weekKey] || {};
+    state[weekKey][input.dataset.plannedShoppingId] = input.checked;
+    savePlannedShoppingState(state);
+    renderNextWeekShoppingList();
+  });
   $("#clearShopping").addEventListener("click", () => {
     localStorage.removeItem(shoppingStateKey);
+    const { week } = buildNextWeekShoppingList();
+    const state = getPlannedShoppingState();
+    delete state[getPlannedShoppingKey(week)];
+    savePlannedShoppingState(state);
     const activeFilter = $("#shoppingFilters .active")?.dataset.shoppingCategory || "Vše";
     renderShoppingList(activeFilter);
+    renderNextWeekShoppingList();
   });
   $("#shoppingForm").addEventListener("submit", (event) => {
     event.preventDefault();

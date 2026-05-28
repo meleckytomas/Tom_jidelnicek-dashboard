@@ -122,6 +122,10 @@
           </div>
           <button id="clearShopping" class="button secondary" type="button">Odškrtnout vše</button>
         </div>
+        <label class="toggle-row planned-shopping-toggle">
+          <input id="togglePlannedShopping" type="checkbox" />
+          <span>Zobrazit nákup podle jídel</span>
+        </label>
         <div class="shopping-layout">
           <article class="card shopping-panel">
             <div class="shopping-toolbar">
@@ -145,7 +149,7 @@
             <p class="muted-text">Seznam je organizační. Když se mění týden, odškrtni vše a jedeš znovu čistě.</p>
           </aside>
         </div>
-        <article class="card next-shopping-card">
+        <article id="plannedShoppingSection" class="card next-shopping-card is-hidden">
           <div class="next-shopping-head">
             <div>
               <span class="pill neutral">Následující týden</span>
