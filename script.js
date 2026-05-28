@@ -75,6 +75,173 @@ const days = [
   }
 ];
 
+const mealRotationWeeks = [
+  {
+    title: "Týden 1 - středomořský základ",
+    focus: "Jednoduché restaurace přes den, doma lehké bílkovinné večeře a fritéza.",
+    meals: [
+      {
+        lunch: { name: "Restaurace: kuřecí prsa, rýže, zelenina, jogurtový dip", protein: 45, note: "Vyber grilované nebo pečené maso, omáčku spíš bokem." },
+        snack: { name: "Protein s jahodami a kefírem", protein: 30, note: "1 odměrka Nutrend + kefír + jahody. Mixér, 3 minuty." },
+        dinner: { name: "Vejce, cottage, kváskový chléb, zelenina", protein: 48, note: "Rychlá večeře bez těžkého vaření. Vejce můžeš udělat na pánvi nebo v Crisp režimu." }
+      },
+      {
+        lunch: { name: "Restaurace: těstoviny s tuňákem nebo kuřetem, rajčata", protein: 42, note: "Bez smetanové omáčky, ideálně rajčatový základ a parmazán." },
+        snack: { name: "Banán + kefír před fotbalem", protein: 12, note: "Lehká energie, netlačit velké jídlo těsně před hrou." },
+        dinner: { name: "Po fotbale tvaroh s kakaem, ovocem a proteinem", protein: 50, note: "Tvaroh + půl až 1 odměrka proteinu + ovoce. Lehké a rychlé po 20:00." }
+      },
+      {
+        lunch: { name: "Restaurace: losos nebo kuře, brambory, zelenina", protein: 45, note: "Ideál po silovém dni, když je možnost ryby." },
+        snack: { name: "Skyr, borůvky, trochu medu", protein: 25, note: "Řízená sladká varianta bez ořechů." },
+        dinner: { name: "Krůtí wrap se zeleninou a jogurtovým dresinkem", protein: 45, note: "Tortilla, krůtí/šunka, sýr, zelenina, jogurt. 10 minut." }
+      },
+      {
+        lunch: { name: "Restaurace: maso na zelenině, rýže nebo brambory", protein: 45, note: "Regenerační den. Drž normální porci, žádný trest." },
+        snack: { name: "Cottage, ovoce, kváskový chléb", protein: 30, note: "Dobré na stabilní energii bez sladkého nájezdu." },
+        dinner: { name: "Velký salát s vejci, sýrem a jogurtovým dresinkem", protein: 42, note: "2 až 3 vejce, sýr, zelenina, jogurtový dresink." }
+      },
+      {
+        lunch: { name: "Restaurace: kuřecí rizoto, hrášek, sýr", protein: 42, note: "Dobrá volba před dokončením silového týdne." },
+        snack: { name: "Proteinové mango smoothie", protein: 30, note: "Mango + kefír/mléko + 1 odměrka proteinu." },
+        dinner: { name: "Crisp domácí hranolky, tvarohový dip, vejce", protein: 40, note: "Brambory v Crisp/fritéze, tvaroh + jogurt + bylinky, 2 vejce." }
+      },
+      {
+        lunch: { name: "Domácí kuřecí bowl s rýží a zeleninou", protein: 50, note: "Kuře na pánvi, rýže, zelenina, jogurtový dip. Vhodné po zóně 2." },
+        snack: { name: "Kefír, ovoce, protein podle hladu", protein: 25, note: "Při delším běhu/kole klidně protein přidej." },
+        dinner: { name: "Těstoviny s lososem a rajčatovou omáčkou", protein: 45, note: "Losos + passata + těstoviny + parmazán. Středomořský základ." }
+      },
+      {
+        lunch: { name: "Po fotbale: vývar + maso/ryba, brambory, zelenina", protein: 50, note: "Normální rodinný oběd, jen drž bílkovinu jako kotvu." },
+        snack: { name: "Skyr nebo tvaroh s ovocem", protein: 30, note: "Lehká svačina po aktivním dopoledni." },
+        dinner: { name: "Omeleta se žampiony, sýrem a kváskovým chlebem", protein: 42, note: "Jediné houby: žampiony. 3 vejce, sýr, zelenina." }
+      }
+    ]
+  },
+  {
+    title: "Týden 2 - krevety, sushi a lehké večeře",
+    focus: "Více ryb, krevety a lehčí středomořské večeře bez smažení.",
+    meals: [
+      {
+        lunch: { name: "Restaurace: kuřecí steak, brambory, salát", protein: 45, note: "Jednoduché, dobré po pondělní síle." },
+        snack: { name: "Skyr s jahodami a medem", protein: 25, note: "Sladké pod kontrolou." },
+        dinner: { name: "Crisp lososové brambory s cottage dipem", protein: 45, note: "Brambory v Crisp, k tomu cottage + jogurt + bylinky, případně losos z pánve." }
+      },
+      {
+        lunch: { name: "Restaurace: sushi set s lososem/tuňákem", protein: 35, note: "Skvělé, jen když je porce menší, doplň protein večer." },
+        snack: { name: "Toast se šunkou a kefír před fotbalem", protein: 25, note: "Lepší než těžké jídlo před intenzitou." },
+        dinner: { name: "Po fotbale omeleta se zeleninou", protein: 40, note: "3 vejce, šunka nebo sýr, zelenina. Lehké a rychlé." }
+      },
+      {
+        lunch: { name: "Restaurace: těstoviny s krevetami a rajčaty", protein: 40, note: "Středomořská volba, bez smetanové omáčky." },
+        snack: { name: "Protein s borůvkami", protein: 30, note: "1 odměrka + kefír/mléko + borůvky." },
+        dinner: { name: "Krůtí maso z pomalého hrnce, rýže, salát", protein: 50, note: "Maso, rajčata, kořenová zelenina, koření. Udělej víc porcí." }
+      },
+      {
+        lunch: { name: "Restaurace: ryba, brambory, zelenina", protein: 42, note: "Regeneračně lehké, přitom dost bílkovin." },
+        snack: { name: "Cottage a ovoce", protein: 28, note: "Jednoduchá svačina do okna 16:8." },
+        dinner: { name: "Řecký salát s vejci a jogurtovým dresinkem", protein: 38, note: "Zelenina, sýr, 2 až 3 vejce, jogurtový dresink." }
+      },
+      {
+        lunch: { name: "Restaurace: kuře, kuskus/rýže, zelenina", protein: 45, note: "Drž přílohu, ať je energie na sílu." },
+        snack: { name: "Mango protein smoothie", protein: 30, note: "Mango + protein + kefír." },
+        dinner: { name: "Crisp brambory, šunka, vejce, tvarohový dip", protein: 42, note: "Domácí páteční comfort bez smažení." }
+      },
+      {
+        lunch: { name: "Krevetová bowl s rýží a zeleninou", protein: 45, note: "Krevety na pánvi 5 minut, rýže, zelenina, jogurtovo-citronový dip." },
+        snack: { name: "Kefír s ovocem a skořicí", protein: 16, note: "Lehké, vhodné i při chuti na sladké." },
+        dinner: { name: "Rajčatové těstoviny s tuňákem a parmazánem", protein: 45, note: "Rychlá večeře, zásobní jídlo z konzervy." }
+      },
+      {
+        lunch: { name: "Po fotbale: kuře nebo ryba, brambory, zelenina", protein: 50, note: "Nedělní klasika, nic komplikovaného." },
+        snack: { name: "Tvaroh s kakaem a ovocem", protein: 35, note: "Sladké bez chaosu." },
+        dinner: { name: "Kváskový chléb, cottage, vejce, zelenina", protein: 42, note: "Jednoduché ukončení týdne." }
+      }
+    ]
+  },
+  {
+    title: "Týden 3 - pomalý hrnec a stabilní energie",
+    focus: "Více meal-prep jídel, pomalý hrnec a jídla, která drží režim bez přemýšlení.",
+    meals: [
+      {
+        lunch: { name: "Restaurace: krůtí/kuřecí, rýže, zelenina", protein: 45, note: "Bez smažení, omáčka bokem." },
+        snack: { name: "Protein s jahodami", protein: 30, note: "Rychle doplní denní příjem." },
+        dinner: { name: "Pomalý hrnec: hovězí/krůtí na zelenině", protein: 55, note: "Maso, rajčata, kořenová zelenina. Porce na 2 až 3 dny." }
+      },
+      {
+        lunch: { name: "Restaurace: těstoviny s kuřetem a rajčaty", protein: 42, note: "Před fotbalem klidně větší oběd." },
+        snack: { name: "Banán + skyr", protein: 25, note: "Před fotbalem, když je hlad větší." },
+        dinner: { name: "Po fotbale tvarohovo-proteinový krém", protein: 50, note: "Tvaroh, protein, kakao, ovoce. Bez těžké přílohy." }
+      },
+      {
+        lunch: { name: "Restaurace: losos, brambory, zelenina", protein: 45, note: "Silový den, dobrá volba tuku a bílkovin." },
+        snack: { name: "Cottage s kváskovým chlebem", protein: 30, note: "Stabilní energie." },
+        dinner: { name: "Wrap s masem z pomalého hrnce", protein: 48, note: "Zbytky masa, tortilla, zelenina, jogurtový dip." }
+      },
+      {
+        lunch: { name: "Restaurace: salát s kuřetem, vejcem nebo sýrem", protein: 40, note: "Regenerační den, ale pořád bílkoviny." },
+        snack: { name: "Kefír s jahodami a skořicí", protein: 16, note: "Lehké na trávení." },
+        dinner: { name: "Omeleta se žampiony a sýrem", protein: 42, note: "3 vejce, žampiony, sýr. Hotovo do 12 minut." }
+      },
+      {
+        lunch: { name: "Restaurace: rizoto s kuřetem nebo krůtou", protein: 42, note: "Dobré před pátkem, neřešit extrémní deficit." },
+        snack: { name: "Protein s mangem", protein: 30, note: "Po práci nebo před večeří." },
+        dinner: { name: "Crisp americké brambory, cottage, šunka", protein: 38, note: "Brambory v Crisp/fritéze, cottage a šunka pro bílkoviny." }
+      },
+      {
+        lunch: { name: "Kuřecí kuskus bowl se zeleninou", protein: 50, note: "Rychlá domácí bowl po vytrvalosti." },
+        snack: { name: "Skyr s ovocem", protein: 25, note: "Podle hladu přidej půl odměrky proteinu." },
+        dinner: { name: "Sushi nebo poke bowl s lososem/krevetami", protein: 35, note: "Když je sushi/poke venku, dobrá víkendová varianta." }
+      },
+      {
+        lunch: { name: "Po fotbale: vývar + maso, brambory/rýže, zelenina", protein: 50, note: "Doplnit, ale nepřejíst se na večer." },
+        snack: { name: "Tvaroh s ovocem", protein: 35, note: "Jednoduché doplnění." },
+        dinner: { name: "Salát s tuňákem, vejcem a jogurtovým dresinkem", protein: 45, note: "Lehká nedělní večeře." }
+      }
+    ]
+  },
+  {
+    title: "Týden 4 - lehčí středomořský týden",
+    focus: "Ryby, kuře, krevety, zelenina a řízené sladké varianty.",
+    meals: [
+      {
+        lunch: { name: "Restaurace: kuře, brambory, zelenina", protein: 45, note: "Jednoduchý silový základ." },
+        snack: { name: "Skyr, borůvky, med", protein: 25, note: "Sladké řízeně." },
+        dinner: { name: "Crisp losos, brambory, jogurtový dip", protein: 48, note: "Brambory Crisp/fritéza, losos pánev/trouba, dip z jogurtu." }
+      },
+      {
+        lunch: { name: "Restaurace: kuřecí těstoviny s rajčaty", protein: 42, note: "Příloha před fotbalem dává smysl." },
+        snack: { name: "Toast se šunkou + kefír", protein: 25, note: "Lehký předzápasový set." },
+        dinner: { name: "Po fotbale skyr + protein + ovoce", protein: 45, note: "Když je pozdě, drž to lehké." }
+      },
+      {
+        lunch: { name: "Restaurace: krevety/ryba, rýže, zelenina", protein: 40, note: "Středomořská volba, žádné smažení." },
+        snack: { name: "Cottage a ovoce", protein: 28, note: "Vhodné mezi obědem a večeří." },
+        dinner: { name: "Krůtí wrap s rajčaty a sýrem", protein: 45, note: "Rychlá domácí večeře po síle." }
+      },
+      {
+        lunch: { name: "Restaurace: maso, zelenina, rýže/brambory", protein: 45, note: "Volnější den, drž porci normální." },
+        snack: { name: "Kefír s ovocem", protein: 16, note: "Lehké a dobré pro trávení." },
+        dinner: { name: "Caprese salát plus vejce a kváskový chléb", protein: 38, note: "Mozzarella/sýr, rajčata, 2 vejce, chléb." }
+      },
+      {
+        lunch: { name: "Restaurace: kuřecí bowl nebo rizoto", protein: 45, note: "Pátek = dotáhnout sílu, nepodjíst se." },
+        snack: { name: "Mango protein smoothie", protein: 30, note: "Mango, kefír/mléko, protein." },
+        dinner: { name: "Domácí hranolky z fritézy, tvarohový dip, vejce", protein: 40, note: "Comfort jídlo bez smažení v oleji." }
+      },
+      {
+        lunch: { name: "Krevetové těstoviny s rajčaty a parmazánem", protein: 42, note: "Krevety na pánvi, passata, těstoviny, parmazán." },
+        snack: { name: "Proteinová zmrzlina bez ořechů", protein: 30, note: "Mražené ovoce, skyr/kefír, protein. Mixér." },
+        dinner: { name: "Tuňákový salát s kváskovým chlebem", protein: 42, note: "Tuňák, vejce, zelenina, jogurtový dresink." }
+      },
+      {
+        lunch: { name: "Po fotbale: sushi/poke nebo ryba s přílohou", protein: 40, note: "Když je sushi, vybírej losos/tuňák/krevety." },
+        snack: { name: "Skyr nebo tvaroh s ovocem", protein: 30, note: "Podle hladu a rodinného programu." },
+        dinner: { name: "Omeleta se sýrem, zeleninou a žampiony", protein: 42, note: "Lehký návrat do režimu před pondělkem." }
+      }
+    ]
+  }
+];
+
 const recipes = [
   ["Losos s americkými bramborami", "Jídla z horkovzdušné fritézy", "Středa, po síle nebo jako víkendový oběd.", "Losos, brambory, zelenina, jogurtový dip.", "Brambory okořeň a dej do fritézy, lososa upeč vedle nebo na pánvi, přidej zeleninu.", "35 až 45 g"],
   ["Krůtí na zelenině z pomalého hrnce", "Jídla z pomalého hrnce", "Čtvrtek nebo jídlo do práce.", "Krůtí maso, kořenová zelenina, rajčata, rýže nebo brambory.", "Vše dej do hrnce, vař pomalu, rozděl na porce.", "40 až 55 g"],
@@ -87,7 +254,13 @@ const recipes = [
   ["Tvaroh s kakaem a ovocem", "Sladké řízené varianty", "Večerní sladká varianta.", "Tvaroh, kakao, ovoce, případně trochu medu.", "Rozmíchej tvaroh s kakaem, přidej ovoce.", "30 až 45 g"],
   ["Kefír s jahodami a skořicí", "Sladké řízené varianty", "Lehká svačina v alergickém období.", "Kefír, jahody, skořice.", "Rozmixuj nebo jen promíchej ve sklenici.", "10 až 18 g"],
   ["Domácí proteinová zmrzlina bez ořechů", "Sladké řízené varianty", "Kontrolované sladké po náročném dni.", "Mražené ovoce, protein, skyr nebo kefír.", "Rozmixuj mražené ovoce s proteinem a skyrem do husté konzistence.", "25 až 40 g"],
-  ["Tvaroh po fotbale", "Večeře po fotbale", "Úterý večer, když je pozdě.", "Tvaroh, protein, ovoce nebo kakao.", "Smíchej, drž porci lehkou a nejez zbytečně těžce před spaním.", "35 až 50 g"]
+  ["Tvaroh po fotbale", "Večeře po fotbale", "Úterý večer, když je pozdě.", "Tvaroh, protein, ovoce nebo kakao.", "Smíchej, drž porci lehkou a nejez zbytečně těžce před spaním.", "35 až 50 g"],
+  ["Crisp losos s bramborami a jogurtovým dipem", "Jídla z horkovzdušné fritézy", "Silový den nebo lehčí víkendová večeře.", "Losos, brambory, bílý jogurt, citron, zelenina.", "Brambory dej do Whirlpool Crisp nebo fritézy, lososa opeč na pánvi nebo dopeč vedle. Jogurt smíchej s citronem a bylinkami.", "45 až 50 g"],
+  ["Krevetové rajčatové těstoviny", "Jídla po tréninku", "Sobota nebo den, kdy chceš středomořskou večeři.", "Krevety, těstoviny, passata, rajčata, parmazán.", "Krevety orestuj 4 až 5 minut, přidej passatu a rajčata, promíchej s těstovinami a posyp parmazánem.", "40 až 45 g"],
+  ["Krůtí maso z pomalého hrnce", "Jídla z pomalého hrnce", "Meal-prep na středu, čtvrtek nebo wrap.", "Krůtí maso, rajčata, kořenová zelenina, rýže nebo wrap.", "Maso, zeleninu a rajčata dej do pomalého hrnce na několik hodin. Hotové maso rozděl na porce k rýži nebo do wrapu.", "45 až 55 g"],
+  ["Krevetová bowl s rýží", "Jídla po tréninku", "Po zóně 2 nebo jako lehký víkendový oběd.", "Krevety, rýže, zelenina, jogurtovo-citronový dip.", "Uvař rýži, krevety krátce opeč, přidej zeleninu a dip z jogurtu, citronu a bylinek.", "40 až 48 g"],
+  ["Omeleta se žampiony a sýrem", "Rychlá jídla", "Regenerační den nebo nedělní večeře.", "Vejce, žampiony, sýr, zelenina, kváskový chléb.", "Žampiony krátce opeč, přidej vejce a sýr. Podávej se zeleninou a podle hladu s kváskovým chlebem.", "38 až 45 g"],
+  ["Proteinový krém po fotbale", "Večeře po fotbale", "Úterý večer, když je pozdě a nechceš těžké jídlo.", "Tvaroh, Nutrend Whey, kakao, ovoce.", "Tvaroh rozmíchej s půl až jednou odměrkou proteinu, kakaem a ovocem. Drž lehkou porci před spaním.", "45 až 55 g"]
 ];
 
 const shoppingCategories = ["Vše", "Bílkoviny", "Mléčné", "Sacharidy a přílohy", "Ovoce", "Zelenina", "Dochucení", "Rychlé záchrany", "Suplementy"];
@@ -405,6 +578,7 @@ const supplements = [
 ];
 
 const storageKey = "tomasCheckinsV2";
+const mealWeekKey = "tomasMealWeekV1";
 const supplementSettingsKey = "tomasSupplementSettingsV2";
 const supplementLogKey = "tomasSupplementLogV2";
 const supplementVisibilityKey = "tomasSupplementVisibilityV2";
@@ -436,8 +610,54 @@ function renderDayTabs() {
   renderDay(0);
 }
 
+function getAutoMealWeekIndex() {
+  const start = new Date("2026-05-18T00:00:00");
+  const now = new Date();
+  const diffDays = Math.floor((now - start) / 86400000);
+  const week = Math.floor(Math.max(diffDays, 0) / 7);
+  return week % mealRotationWeeks.length;
+}
+
+function getSelectedMealWeekIndex() {
+  const saved = localStorage.getItem(mealWeekKey);
+  return saved === null ? getAutoMealWeekIndex() : Number(saved);
+}
+
+function getMealForDay(dayIndex) {
+  return mealRotationWeeks[getSelectedMealWeekIndex()].meals[dayIndex];
+}
+
+function proteinClass(protein) {
+  if (protein >= 45) return "protein-high";
+  if (protein >= 30) return "protein-mid";
+  return "protein-low";
+}
+
+function proteinBadge(protein) {
+  return `<span class="protein-badge ${proteinClass(protein)}">${protein} g bílkovin</span>`;
+}
+
+function renderMealWeekSelect() {
+  const selected = getSelectedMealWeekIndex();
+  $("#mealWeekSelect").innerHTML = mealRotationWeeks.map((week, index) => `
+    <option value="${index}" ${index === selected ? "selected" : ""}>${week.title}</option>
+  `).join("");
+  $("#mealWeekSummary").textContent = mealRotationWeeks[selected].focus;
+}
+
+function bindMealWeekSelect() {
+  $("#mealWeekSelect").addEventListener("change", (event) => {
+    localStorage.setItem(mealWeekKey, event.target.value);
+    renderMealWeekSelect();
+    renderMeals();
+    const activeDay = document.querySelector(".tab.active");
+    renderDay(Number(activeDay?.dataset.day || 0));
+  });
+}
+
 function renderDay(index) {
   const item = days[index];
+  const meal = getMealForDay(index);
   $("#dayDetail").innerHTML = `
     <section>
       <div class="day-meta">
@@ -450,24 +670,34 @@ function renderDay(index) {
     </section>
     <aside>
       <h3>Jídlo</h3>
-      <p><b>Oběd:</b> ${item.meals[0]}</p>
-      <p><b>Svačina:</b> ${item.meals[1]}</p>
-      <p><b>Večeře:</b> ${item.meals[2]}</p>
+      <p><b>Oběd:</b> ${meal.lunch.name} ${proteinBadge(meal.lunch.protein)}<br><small>${meal.lunch.note}</small></p>
+      <p><b>Svačina:</b> ${meal.snack.name} ${proteinBadge(meal.snack.protein)}<br><small>${meal.snack.note}</small></p>
+      <p><b>Večeře:</b> ${meal.dinner.name} ${proteinBadge(meal.dinner.protein)}<br><small>${meal.dinner.note}</small></p>
       <p>${item.note}</p>
     </aside>
   `;
 }
 
 function renderMeals() {
-  $("#mealGrid").innerHTML = days.map((item) => `
+  $("#mealGrid").innerHTML = days.map((item, index) => `
     <article class="meal-card">
       <span class="pill ${item.type}">${item.day}</span>
       <h3>${item.label}</h3>
-      <p><b>Oběd:</b> ${item.meals[0]}</p>
-      <p><b>Svačina:</b> ${item.meals[1]}</p>
-      <p><b>Večeře:</b> ${item.meals[2]}</p>
+      ${renderMealBlock(getMealForDay(index).lunch, "Oběd")}
+      ${renderMealBlock(getMealForDay(index).snack, "Svačina")}
+      ${renderMealBlock(getMealForDay(index).dinner, "Večeře")}
     </article>
   `).join("");
+}
+
+function renderMealBlock(meal, label) {
+  return `
+    <div class="meal-line">
+      <div><b>${label}:</b> ${meal.name}</div>
+      ${proteinBadge(meal.protein)}
+      <small>${meal.note}</small>
+    </div>
+  `;
 }
 
 function renderRecipes(active = "Vše") {
@@ -968,6 +1198,8 @@ function bindCheckin() {
 }
 
 renderMetrics();
+renderMealWeekSelect();
+bindMealWeekSelect();
 renderDayTabs();
 renderMeals();
 renderRecipes();
