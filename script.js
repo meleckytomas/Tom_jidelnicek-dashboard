@@ -782,7 +782,6 @@ const supplementVisibilityKey = "tomasSupplementVisibilityV2";
 const shoppingStateKey = "tomasShoppingStateV2";
 const customShoppingKey = "tomasCustomShoppingV2";
 const plannedShoppingStateKey = "tomasPlannedShoppingStateV1";
-const plannedShoppingVisibilityKey = "tomasPlannedShoppingVisibilityV1";
 const recipesVisibilityKey = "tomasRecipesVisibilityV1";
 const $ = (selector) => document.querySelector(selector);
 
@@ -1128,19 +1127,6 @@ function getPlannedShoppingKey(week) {
   return `week-${week.title}`;
 }
 
-function applyPlannedShoppingVisibility() {
-  const visible = localStorage.getItem(plannedShoppingVisibilityKey) === "true";
-  $("#togglePlannedShopping").checked = visible;
-  $("#plannedShoppingSection").classList.toggle("is-hidden", !visible);
-}
-
-function bindPlannedShoppingVisibility() {
-  $("#togglePlannedShopping").addEventListener("change", (event) => {
-    localStorage.setItem(plannedShoppingVisibilityKey, String(event.target.checked));
-    applyPlannedShoppingVisibility();
-  });
-}
-
 function renderShoppingFilters(active = "Vše") {
   $("#shoppingFilters").innerHTML = shoppingCategories.map((category) => `
     <button class="filter ${category === active ? "active" : ""}" type="button" data-shopping-category="${category}">${category}</button>
@@ -1253,12 +1239,8 @@ function getIngredientIdsForMeal(meal) {
     .map(([id]) => id);
 }
 
-function getNextMealWeekIndex() {
-  return (getSelectedMealWeekIndex() + 1) % mealRotationWeeks.length;
-}
-
 function buildNextWeekShoppingList() {
-  const weekIndex = getNextMealWeekIndex();
+  const weekIndex = getSelectedMealWeekIndex();
   const week = mealRotationWeeks[weekIndex];
   const catalog = new Map(baseShoppingItems.map((item) => [item.id, item]));
   const usage = new Map();
@@ -1294,7 +1276,7 @@ function renderNextWeekShoppingList() {
   const weekKey = getPlannedShoppingKey(week);
   const checked = state[weekKey] || {};
   const checkedCount = items.filter((item) => checked[item.id]).length;
-  summary.textContent = `${week.title}. Odškrtnuto ${checkedCount}/${items.length}. Vygenerováno z obědů, svačin a večeří v rotaci.`;
+  summary.textContent = `${week.title}. Odškrtnuto ${checkedCount}/${items.length}. Jen suroviny z jídel tohoto vybraného týdne.`;
 
   target.innerHTML = shoppingCategories
     .filter((category) => category !== "Vše")
@@ -1331,8 +1313,6 @@ function initShopping() {
 
   renderShoppingFilters();
   renderNextWeekShoppingList();
-  applyPlannedShoppingVisibility();
-  bindPlannedShoppingVisibility();
   $("#shoppingFilters").addEventListener("click", (event) => {
     const button = event.target.closest("button");
     if (button) renderShoppingFilters(button.dataset.shoppingCategory);
