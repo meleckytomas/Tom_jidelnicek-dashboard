@@ -301,7 +301,12 @@ const recipes = [
   ["Krůtí maso z pomalého hrnce", "Jídla z pomalého hrnce", "Meal-prep na středu, čtvrtek nebo wrap.", "Krůtí maso, rajčata, kořenová zelenina, rýže nebo wrap.", "Maso, zeleninu a rajčata dej do pomalého hrnce na několik hodin. Hotové maso rozděl na porce k rýži nebo do wrapu.", "45 až 55 g"],
   ["Krevetová bowl s rýží", "Jídla po tréninku", "Po zóně 2 nebo jako lehký víkendový oběd.", "Krevety, rýže, zelenina, jogurtovo-citronový dip.", "Uvař rýži, krevety krátce opeč, přidej zeleninu a dip z jogurtu, citronu a bylinek.", "40 až 48 g"],
   ["Omeleta se žampiony a sýrem", "Rychlá jídla", "Regenerační den nebo nedělní večeře.", "Vejce, žampiony, sýr, zelenina, kváskový chléb.", "Žampiony krátce opeč, přidej vejce a sýr. Podávej se zeleninou a podle hladu s kváskovým chlebem.", "38 až 45 g"],
-  ["Proteinový krém po fotbale", "Večeře po fotbale", "Úterý večer, když je pozdě a nechceš těžké jídlo.", "Tvaroh, Nutrend Whey, kakao, ovoce.", "Tvaroh rozmíchej s půl až jednou odměrkou proteinu, kakaem a ovocem. Drž lehkou porci před spaním.", "45 až 55 g"]
+  ["Proteinový krém po fotbale", "Večeře po fotbale", "Úterý večer, když je pozdě a nechceš těžké jídlo.", "Tvaroh, Nutrend Whey, kakao, ovoce.", "Tvaroh rozmíchej s půl až jednou odměrkou proteinu, kakaem a ovocem. Drž lehkou porci před spaním.", "45 až 55 g"],
+  ["Vepřová panenka s bramborami z fritézy", "Jídla z horkovzdušné fritézy", "Silový den, když chceš změnu od kuřecího.", "Vepřová panenka, brambory, cuketa nebo salát, jogurtovo-hořčičný dip.", "Panenku osol, opepři a krátce opeč na pánvi nebo v troubě. Brambory udělej ve fritéze/Crisp, k tomu salát a dip z jogurtu, hořčice a bylinek.", "45 až 55 g"],
+  ["Hovězí mleté s rajčaty a rýží", "Jídla do práce", "Meal-prep na dny, kdy nejde restaurace.", "Libovější hovězí mleté, krájená rajčata, rajčatový protlak, rýže, zelenina.", "Mleté maso orestuj, přidej rajčata, protlak a koření. Podávej s rýží a zeleninou, případně rozděl na krabičky.", "40 až 55 g"],
+  ["Celozrnné pečivo s cottage a šunkou", "Rychlá jídla", "Rychlá večeře nebo záchrana v jídelním okně.", "Celozrnné pečivo, cottage nebo Palouček, kvalitní šunka, okurka, rajčata.", "Pečivo doplň cottage/čerstvým sýrem, šunkou a zeleninou. Hodí se, když nechceš vařit.", "30 až 45 g"],
+  ["Řecký jogurt s proteinem a mraženým ovocem", "Sladké řízené varianty", "Když je chuť na sladké, ale chceš držet bílkoviny.", "Řecký jogurt nebo skyr, Nutrend Whey, mražené jahody/borůvky/mango, trochu medu nebo džemu.", "Jogurt rozmíchej s proteinem, přidej mražené ovoce. Med nebo džem drž jako malý doplněk, ne základ.", "35 až 50 g"],
+  ["Tuňákovo-fazolový salát s pečivem", "Jídla do práce", "Rychlé jídlo ze zásob ve spíži.", "Tuňák, fazole nebo cizrna z konzervy, okurka, rajčata, olivový olej, celozrnné pečivo.", "Konzervy slij, promíchej se zeleninou, citronem a trochou olivového oleje. Přidej pečivo podle hladu.", "35 až 50 g"]
 ];
 
 function inferRecipeDetails(meal, mealType) {
@@ -312,7 +317,8 @@ function inferRecipeDetails(meal, mealType) {
 
   if (text.includes("kuře") || text.includes("kuřecí")) ingredients.push("kuřecí maso");
   if (text.includes("krůt")) ingredients.push("krůtí maso");
-  if (text.includes("hovězí")) ingredients.push("hovězí maso");
+  if (text.includes("panenka")) ingredients.push("vepřová panenka");
+  if (text.includes("hovězí") || text.includes("mleté")) ingredients.push("hovězí maso nebo libovější hovězí mleté");
   if (text.includes("losos") || text.includes("ryba")) ingredients.push("losos nebo jiná ryba");
   if (text.includes("tuňák")) ingredients.push("tuňák");
   if (text.includes("krevety")) ingredients.push("krevety");
@@ -321,7 +327,11 @@ function inferRecipeDetails(meal, mealType) {
   if (text.includes("skyr")) ingredients.push("skyr");
   if (text.includes("tvaroh")) ingredients.push("tvaroh");
   if (text.includes("cottage")) ingredients.push("cottage");
+  if (text.includes("palouček") || text.includes("čerstvý sýr")) ingredients.push("čerstvý sýr typu Palouček");
   if (text.includes("kefír")) ingredients.push("kefír");
+  if (text.includes("mléko")) ingredients.push("mléko");
+  if (text.includes("řecký jogurt")) ingredients.push("řecký jogurt");
+  if (text.includes("pudding") || text.includes("pudink")) ingredients.push("high protein pudink");
   if (text.includes("protein")) ingredients.push("Nutrend Whey Protein");
   if (text.includes("rýže")) ingredients.push("rýže");
   if (text.includes("brambor") || text.includes("hranolky")) ingredients.push("brambory");
@@ -329,18 +339,25 @@ function inferRecipeDetails(meal, mealType) {
   if (text.includes("kuskus")) ingredients.push("kuskus");
   if (text.includes("wrap") || text.includes("tortilla")) ingredients.push("wrap nebo tortilla");
   if (text.includes("kváskov")) ingredients.push("kváskový chléb");
+  if (text.includes("celozrn")) ingredients.push("celozrnné pečivo");
   if (text.includes("sushi") || text.includes("poke")) ingredients.push("sushi rýže nebo rýže do poke", "losos/tuňák/krevety", "okurka", "sójová omáčka");
+  if (text.includes("fazole") || text.includes("cizrna")) ingredients.push("fazole nebo cizrna");
   if (text.includes("rajč")) ingredients.push("rajčata nebo passata");
   if (text.includes("zelenin") || text.includes("salát")) ingredients.push("zelenina");
+  if (text.includes("cuketa")) ingredients.push("cuketa");
+  if (text.includes("okurka")) ingredients.push("okurka");
+  if (text.includes("avokádo")) ingredients.push("avokádo");
   if (text.includes("žampiony")) ingredients.push("žampiony");
   if (text.includes("sýr") || text.includes("parmazán") || text.includes("mozzarella")) ingredients.push("sýr nebo parmazán");
   if (text.includes("jogurt") || text.includes("dip") || text.includes("dresink")) ingredients.push("bílý jogurt", "citron", "bylinky");
   if (text.includes("jahod")) ingredients.push("jahody");
   if (text.includes("borův")) ingredients.push("borůvky");
   if (text.includes("mango")) ingredients.push("mango");
+  if (text.includes("mražené ovoce")) ingredients.push("mražené ovoce");
   if (text.includes("ovoce")) ingredients.push("ovoce");
   if (text.includes("kakao")) ingredients.push("kakao");
   if (text.includes("med")) ingredients.push("med");
+  if (text.includes("džem")) ingredients.push("džem bez ořechů");
   if (text.includes("banán")) ingredients.push("banán");
 
   if (!ingredients.length) ingredients.push("hlavní bílkovina podle jídla", "příloha podle dne", "zelenina", "jogurtový dip");
@@ -400,7 +417,7 @@ function getAllRecipes() {
   return [...recipes, ...getRotationRecipes()];
 }
 
-const shoppingCategories = ["Vše", "Bílkoviny", "Mléčné", "Sacharidy a přílohy", "Ovoce", "Zelenina", "Dochucení", "Rychlé záchrany", "Suplementy"];
+const shoppingCategories = ["Vše", "Bílkoviny", "Mléčné", "Sacharidy a přílohy", "Ovoce", "Zelenina", "Luštěniny a konzervy", "Dochucení", "Rychlé záchrany", "Suplementy"];
 
 const baseShoppingItems = [
   { id: "chicken-turkey", name: "Kuře nebo krůta", category: "Bílkoviny", amount: "1 až 2 kg", frequency: "týdně", note: "Bowl, rizoto, rýže se zeleninou, jídlo do práce." },
@@ -408,30 +425,47 @@ const baseShoppingItems = [
   { id: "shrimp", name: "Krevety", category: "Bílkoviny", amount: "1 až 2 balení", frequency: "podle týdne", note: "Krevetové těstoviny, bowl, poke nebo domácí sushi varianta." },
   { id: "tuna", name: "Tuňák", category: "Bílkoviny", amount: "2 až 4 konzervy", frequency: "týdně", note: "Rychlé těstoviny, záchrana do práce." },
   { id: "beef", name: "Hovězí maso", category: "Bílkoviny", amount: "1 balení", frequency: "podle rotace", note: "Pomalý hrnec, maso na zelenině." },
+  { id: "ground-beef", name: "Libovější hovězí mleté", category: "Bílkoviny", amount: "1 až 2 balení", frequency: "podle týdne", note: "Rajčatová omáčka, rýže, těstoviny, krabičky." },
+  { id: "pork-tenderloin", name: "Vepřová panenka", category: "Bílkoviny", amount: "1 balení", frequency: "podle týdne", note: "Rychlá změna od kuřecího, dobrá k bramborám a zelenině." },
   { id: "eggs", name: "Vejce", category: "Bílkoviny", amount: "10 až 15 ks", frequency: "týdně", note: "Večeře, omeleta, salát, po fotbale." },
   { id: "ham", name: "Kvalitní šunka", category: "Bílkoviny", amount: "1 až 2 balení", frequency: "týdně", note: "Toast, kváskový chléb, rychlá večeře." },
   { id: "skyr", name: "Skyr", category: "Mléčné", amount: "4 až 6 ks", frequency: "týdně", note: "Svačina, sladká řízená varianta, doplnění bílkovin." },
   { id: "curd", name: "Tvaroh", category: "Mléčné", amount: "3 až 5 ks", frequency: "týdně", note: "Večeře po fotbale, kakao s ovocem, dip." },
   { id: "cottage", name: "Cottage", category: "Mléčné", amount: "2 až 4 ks", frequency: "týdně", note: "Kváskový chléb, svačina, večeře." },
+  { id: "fresh-cheese", name: "Čerstvý sýr / Palouček", category: "Mléčné", amount: "2 až 4 ks", frequency: "týdně", note: "Pečivo, rychlá večeře, lehký základ místo pomazánek." },
   { id: "kefir", name: "Kefír", category: "Mléčné", amount: "2 až 4 lahve", frequency: "týdně", note: "Před fotbalem, smoothie, trávení." },
+  { id: "milk", name: "Mléko", category: "Mléčné", amount: "2 až 4 l", frequency: "týdně", note: "Smoothie, protein, vaření. Vol podle tolerance a cíle." },
   { id: "yogurt", name: "Bílý jogurt", category: "Mléčné", amount: "1 velké balení", frequency: "týdně", note: "Dip, dresink, bowl." },
+  { id: "greek-yogurt", name: "Řecký jogurt / high protein jogurt", category: "Mléčné", amount: "2 až 5 ks", frequency: "týdně", note: "Sladká řízená varianta, svačina, doplnění bílkovin." },
+  { id: "protein-pudding", name: "High protein pudink", category: "Mléčné", amount: "2 až 4 ks", frequency: "podle chuti", note: "Rychlá sladká záchrana bez vaření." },
   { id: "mozzarella-feta", name: "Mozzarella nebo feta", category: "Mléčné", amount: "1 až 2 ks", frequency: "podle týdne", note: "Caprese, řecký salát, středomořské večeře." },
+  { id: "grana-padano", name: "Grana Padano / parmazán", category: "Mléčné", amount: "1 ks", frequency: "průběžně", note: "Těstoviny, rizoto, saláty, dochucení bez těžké omáčky." },
   { id: "sourdough", name: "Kváskový chléb / pečivo", category: "Sacharidy a přílohy", amount: "1 až 2 ks", frequency: "týdně", note: "Večeře, toast před fotbalem." },
+  { id: "wholegrain-pastry", name: "Celozrnné pečivo", category: "Sacharidy a přílohy", amount: "1 až 2 balení", frequency: "týdně", note: "Rychlá večeře, svačina, pečivo k salátu." },
   { id: "rice", name: "Rýže", category: "Sacharidy a přílohy", amount: "zásoba", frequency: "průběžně", note: "Kuře, bowl, pomalý hrnec." },
   { id: "sushi-rice", name: "Sushi rýže / poke rýže", category: "Sacharidy a přílohy", amount: "zásoba", frequency: "podle chuti", note: "Domácí sushi nebo poke bowl s lososem, tuňákem či krevetami." },
   { id: "pasta", name: "Těstoviny", category: "Sacharidy a přílohy", amount: "2 balení", frequency: "týdně", note: "Tuňák, losos, rajčatová omáčka." },
   { id: "potatoes", name: "Brambory", category: "Sacharidy a přílohy", amount: "2 až 3 kg", frequency: "týdně", note: "Americké brambory, hranolky, příloha." },
   { id: "couscous", name: "Kuskus", category: "Sacharidy a přílohy", amount: "1 balení", frequency: "průběžně", note: "Rychlá bowl varianta." },
+  { id: "gnocchi", name: "Gnocchi", category: "Sacharidy a přílohy", amount: "1 balení", frequency: "podle chuti", note: "Rychlá pánev s kuřecím, rajčaty nebo zeleninou." },
   { id: "bananas", name: "Banány", category: "Ovoce", amount: "5 až 7 ks", frequency: "týdně", note: "Před fotbalem, rychlá energie." },
   { id: "berries", name: "Jahody / borůvky", category: "Ovoce", amount: "mražené nebo čerstvé", frequency: "týdně", note: "Protein, skyr, tvaroh, sladké chutě." },
+  { id: "frozen-fruit", name: "Mražené ovoce do smoothie", category: "Ovoce", amount: "2 až 4 sáčky", frequency: "průběžně", note: "Jahody, borůvky, mango. Proteinové smoothie a zmrzlina." },
   { id: "mango", name: "Mango", category: "Ovoce", amount: "mražené", frequency: "průběžně", note: "Smoothie, proteinová zmrzlina." },
   { id: "apples", name: "Jablka nebo sezónní ovoce", category: "Ovoce", amount: "5 ks", frequency: "týdně", note: "Svačina, skyr, tvaroh." },
   { id: "leafy", name: "Listový salát", category: "Zelenina", amount: "1 až 2 balení", frequency: "týdně", note: "Čtvrteční salát, bowl, večeře." },
   { id: "tomatoes", name: "Rajčata", category: "Zelenina", amount: "1 balení", frequency: "týdně", note: "Těstoviny, saláty, omeleta." },
   { id: "cucumber", name: "Okurka", category: "Zelenina", amount: "1 až 2 ks", frequency: "týdně", note: "Večeře, chléb, saláty." },
+  { id: "zucchini", name: "Cuketa", category: "Zelenina", amount: "2 až 4 ks", frequency: "týdně", note: "Pánev, příloha, fritéza, těstoviny." },
+  { id: "radishes", name: "Ředkvičky", category: "Zelenina", amount: "1 svazek", frequency: "podle chuti", note: "Pečivo, salát, rychlá křupavá zelenina." },
+  { id: "avocado", name: "Avokádo", category: "Zelenina", amount: "1 až 2 ks", frequency: "podle týdne", note: "Salát, pečivo, bowl. Hlídá se porce kvůli energii." },
   { id: "frozen-veg", name: "Mražená zelenina", category: "Zelenina", amount: "2 balení", frequency: "týdně", note: "Rizoto, rychlá příloha, záchrana." },
   { id: "root-veg", name: "Kořenová zelenina", category: "Zelenina", amount: "1 balení", frequency: "týdně", note: "Pomalý hrnec, vývar, maso na zelenině." },
   { id: "mushrooms", name: "Žampiony", category: "Zelenina", amount: "1 balení", frequency: "podle týdne", note: "Omeleta, jediná houbová varianta, kterou chceš v plánu." },
+  { id: "beans-chickpeas", name: "Fazole / cizrna v konzervě", category: "Luštěniny a konzervy", amount: "2 až 4 konzervy", frequency: "průběžně", note: "Tuňákový salát, rychlá bowl, záloha do práce." },
+  { id: "lentils", name: "Čočka / červená čočka", category: "Luštěniny a konzervy", amount: "zásoba", frequency: "průběžně", note: "Rychlá polévka, omáčka, příloha s vyšší sytostí." },
+  { id: "canned-tomatoes", name: "Krájená rajčata v konzervě", category: "Luštěniny a konzervy", amount: "2 až 4 ks", frequency: "průběžně", note: "Mleté hovězí, těstoviny, pomalý hrnec." },
+  { id: "tomato-paste", name: "Rajčatový protlak", category: "Luštěniny a konzervy", amount: "1 až 2 ks", frequency: "průběžně", note: "Zahuštění rajčatové omáčky bez smetany." },
   { id: "parmesan-cheese", name: "Parmazán / tvrdý sýr", category: "Dochucení", amount: "1 ks", frequency: "průběžně", note: "Těstoviny, rizoto, wrap." },
   { id: "olive-oil", name: "Olivový olej", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Středomořská kuchyně, saláty, ryby, krevety." },
   { id: "lemon", name: "Citron", category: "Dochucení", amount: "2 až 4 ks", frequency: "týdně", note: "Jogurtové dipy, ryby, krevety, saláty." },
@@ -440,6 +474,9 @@ const baseShoppingItems = [
   { id: "cocoa", name: "Kakao", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Tvaroh s kakaem místo náhodného sladkého." },
   { id: "honey", name: "Med", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Malé množství do skyru nebo tvarohu." },
   { id: "cinnamon", name: "Skořice", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Kefír, ovoce, tvaroh." },
+  { id: "mustard", name: "Hořčice", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Jogurtový dip, maso, pečivo." },
+  { id: "pickles", name: "Okurky / nakládaná zelenina", category: "Dochucení", amount: "1 sklenice", frequency: "průběžně", note: "K pečivu, salátu, rychlé večeři." },
+  { id: "jam", name: "Džem / ochucený med", category: "Dochucení", amount: "1 ks", frequency: "podle chuti", note: "Řízené sladké do jogurtu nebo tvarohu. Bez ořechů." },
   { id: "tomato-passata", name: "Rajčatová passata", category: "Rychlé záchrany", amount: "2 ks", frequency: "týdně", note: "Těstoviny, pomalý hrnec, rychlá omáčka." },
   { id: "wraps", name: "Wrapy", category: "Rychlé záchrany", amount: "1 balení", frequency: "týdně", note: "Krůtí wrap, rychlý oběd." },
   { id: "protein-powder", name: "Nutrend Whey Protein", category: "Suplementy", amount: "hlídat zásobu", frequency: "průběžně", note: "Smoothie, dorovnání bílkovin, po tréninku." },
@@ -933,6 +970,8 @@ function renderShoppingList(active = "Vše") {
 const mealIngredientRules = [
   ["chicken-turkey", ["kuř", "krůt"]],
   ["beef", ["hověz"]],
+  ["ground-beef", ["mleté"]],
+  ["pork-tenderloin", ["panenka"]],
   ["salmon", ["losos", "ryba"]],
   ["shrimp", ["krevet"]],
   ["tuna", ["tuňák"]],
@@ -941,26 +980,41 @@ const mealIngredientRules = [
   ["skyr", ["skyr"]],
   ["curd", ["tvaroh"]],
   ["cottage", ["cottage"]],
+  ["fresh-cheese", ["palouček", "čerstvý sýr"]],
   ["kefir", ["kefír", "kefir"]],
+  ["milk", ["mléko"]],
+  ["greek-yogurt", ["řecký jogurt", "high protein jogurt"]],
+  ["protein-pudding", ["pudding", "pudink"]],
   ["yogurt", ["jogurt", "dip", "dresink"]],
   ["mozzarella-feta", ["mozzarella", "feta", "řecký salát", "sýr"]],
+  ["grana-padano", ["grana", "parmazán"]],
   ["sourdough", ["kváskov", "toast"]],
+  ["wholegrain-pastry", ["celozrn"]],
   ["rice", ["rýže", "rizoto", "bowl"]],
   ["sushi-rice", ["sushi", "poke"]],
   ["pasta", ["těstovin"]],
   ["potatoes", ["brambor", "hranol"]],
   ["couscous", ["kuskus"]],
+  ["gnocchi", ["gnocchi"]],
   ["wraps", ["wrap", "tortilla"]],
   ["bananas", ["banán"]],
   ["berries", ["jahod", "borůvk", "ovoce"]],
+  ["frozen-fruit", ["mražené ovoce", "smoothie", "zmrzlina"]],
   ["mango", ["mango"]],
   ["apples", ["sezónní ovoce", "jabl"]],
   ["leafy", ["salát", "zelenina"]],
   ["tomatoes", ["rajč"]],
   ["cucumber", ["okurk", "sushi", "poke"]],
+  ["zucchini", ["cuketa"]],
+  ["radishes", ["ředkvič"]],
+  ["avocado", ["avokádo"]],
   ["frozen-veg", ["hrášek", "mražen"]],
   ["root-veg", ["kořenová", "vývar"]],
   ["mushrooms", ["žampion"]],
+  ["beans-chickpeas", ["fazole", "cizrna"]],
+  ["lentils", ["čočka", "červená čočka"]],
+  ["canned-tomatoes", ["krájená rajčata", "rajčata v konzervě"]],
+  ["tomato-paste", ["protlak"]],
   ["parmesan-cheese", ["parmazán", "tvrdý sýr"]],
   ["olive-oil", ["středomoř", "oliv", "losos", "krevet", "salát"]],
   ["lemon", ["citron", "losos", "krevet", "dip"]],
@@ -968,6 +1022,9 @@ const mealIngredientRules = [
   ["soy-sauce", ["sushi", "poke"]],
   ["cocoa", ["kakao"]],
   ["honey", ["med"]],
+  ["jam", ["džem"]],
+  ["mustard", ["hořčic"]],
+  ["pickles", ["nakládan", "okurky"]],
   ["cinnamon", ["skořic"]],
   ["tomato-passata", ["rajčatová omáčka", "passata", "rajčaty"]],
   ["protein-powder", ["protein"]],
