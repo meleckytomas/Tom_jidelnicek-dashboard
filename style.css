@@ -137,6 +137,15 @@ main { width: min(1180px, calc(100% - 32px)); margin: 0 auto 56px; }
 .metric-card span { color: var(--muted); font-size: 0.86rem; }
 .metric-card strong { display: block; font-size: 1.34rem; margin: 8px 0 6px; }
 .metric-card p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.45; }
+.garmin-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+.garmin-table-wrap table {
+  min-width: 760px;
+}
 
 .goal-grid, .two-column, .checkin-layout {
   display: grid;
@@ -676,7 +685,7 @@ th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-
 
 @media (max-width: 900px) {
   .hero-grid, .day-detail, .goal-grid, .two-column, .checkin-layout, .supplement-shell, .shopping-layout { grid-template-columns: 1fr; }
-  .metrics-grid, .meal-grid, .recipe-grid, .supplement-weekly { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metrics-grid, .meal-grid, .recipe-grid, .supplement-weekly, .garmin-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nutrition-strip { grid-template-columns: 1fr; }
 }
 
@@ -684,7 +693,7 @@ th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-
   main, .hero { width: min(100% - 20px, 1180px); padding-left: 0; padding-right: 0; }
   .topbar { align-items: flex-start; flex-direction: column; }
   .hero h1 { font-size: 2.35rem; }
-  .metrics-grid, .meal-grid, .recipe-grid, .form-grid, .supplement-grid, .supplement-fields, .supplement-weekly, .shopping-category > div { grid-template-columns: 1fr; }
+  .metrics-grid, .meal-grid, .recipe-grid, .form-grid, .supplement-grid, .supplement-fields, .supplement-weekly, .shopping-category > div, .garmin-summary-grid { grid-template-columns: 1fr; }
   .inline-heading, .supplement-heading, .meal-rotation-toolbar { align-items: flex-start; flex-direction: column; }
   .visibility-toggles, .toggle-row { width: 100%; }
   .visibility-toggles { justify-content: stretch; }

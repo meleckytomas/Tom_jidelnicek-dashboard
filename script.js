@@ -9,6 +9,43 @@ const metrics = [
   ["Stres", "27 / 25", "4 týdny / rok, alergie může dočasně přidat zátěž."]
 ];
 
+const garminReports = [
+  {
+    period: "22. 5. - 28. 5. 2026",
+    source: "Garmin Connect screenshoty, váha a pas budou doplněny v pondělí.",
+    weekly: {
+      avgSleep: "7 h 13 min",
+      avgSleepScore: 82,
+      hrvSevenDayLatest: 40,
+      avgNightHrv: 41,
+      avgStress: 22,
+      avgCalories: 2672,
+      avgHeartRate: 56,
+      maxHeartRate: 164,
+      stepsTotal: 98231,
+      stepsAverage: 14725,
+      distanceKm: 78.4
+    },
+    intensity: {
+      period: "25. 5. - 31. 5. 2026",
+      total: 312,
+      goal: 420,
+      percent: 74,
+      moderate: 104,
+      vigorous: 104
+    },
+    daily: [
+      { date: "2026-05-22", day: "pátek", sleepScore: 86, sleepDuration: "7 h 39 min", hrvSevenDay: 34, hrvNight: 34, calories: 2920, stress: 20, heartAvg: 56, heartMax: 164 },
+      { date: "2026-05-23", day: "sobota", sleepScore: 81, sleepDuration: "6 h 29 min", hrvSevenDay: 35, hrvNight: 40, calories: 2736, stress: 30, heartAvg: 57, heartMax: 138 },
+      { date: "2026-05-24", day: "neděle", sleepScore: 66, sleepDuration: "7 h 56 min", hrvSevenDay: 36, hrvNight: 32, calories: 2768, stress: 21, heartAvg: 55, heartMax: 158 },
+      { date: "2026-05-25", day: "pondělí", sleepScore: 89, sleepDuration: "7 h 27 min", hrvSevenDay: 37, hrvNight: 47, calories: 3001, stress: 20, heartAvg: 55, heartMax: 164 },
+      { date: "2026-05-26", day: "úterý", sleepScore: 72, sleepDuration: "6 h 34 min", hrvSevenDay: 38, hrvNight: 43, calories: 2906, stress: 19, heartAvg: 56, heartMax: 155 },
+      { date: "2026-05-27", day: "středa", sleepScore: 91, sleepDuration: "7 h 13 min", hrvSevenDay: 39, hrvNight: 44, calories: 2429, stress: 24, heartAvg: 56, heartMax: 107 },
+      { date: "2026-05-28", day: "čtvrtek", sleepScore: 87, sleepDuration: "7 h 11 min", hrvSevenDay: 40, hrvNight: 44, calories: 1946, stress: 19, heartAvg: 54, heartMax: 137 }
+    ]
+  }
+];
+
 const days = [
   {
     day: "Pondělí",
@@ -1211,6 +1248,71 @@ function renderEvaluation(notes) {
   $("#nextWeekAdvice").textContent = notes[0];
 }
 
+function formatNumber(value) {
+  return new Intl.NumberFormat("cs-CZ").format(value);
+}
+
+function renderGarminMetrics() {
+  const report = garminReports[0];
+  const weekly = report.weekly;
+  const intensity = report.intensity;
+  const intensityWidth = Math.min(intensity.percent, 100);
+  $("#garminSummary").innerHTML = `
+    <article class="metric-card">
+      <span>Období</span>
+      <strong>${report.period}</strong>
+      <p>${report.source}</p>
+    </article>
+    <article class="metric-card">
+      <span>Spánek</span>
+      <strong>${weekly.avgSleep}</strong>
+      <p>Průměrné skóre ${weekly.avgSleepScore}. Cíl je posunout se blíž k 7 h 45 min až 8 h.</p>
+    </article>
+    <article class="metric-card">
+      <span>HRV</span>
+      <strong>${weekly.hrvSevenDayLatest} ms</strong>
+      <p>Poslední 7denní průměr. Průměr noční HRV za týden cca ${weekly.avgNightHrv} ms.</p>
+    </article>
+    <article class="metric-card">
+      <span>Tep</span>
+      <strong>${weekly.avgHeartRate} bpm</strong>
+      <p>Průměr denních hodnot, týdenní maximum ${weekly.maxHeartRate} bpm.</p>
+    </article>
+    <article class="metric-card">
+      <span>Stres</span>
+      <strong>${weekly.avgStress}</strong>
+      <p>Průměr týdne, nejvyšší den byl 30 v sobotu.</p>
+    </article>
+    <article class="metric-card">
+      <span>Kalorie</span>
+      <strong>${formatNumber(weekly.avgCalories)}</strong>
+      <p>Průměr spálených kalorií za den v období ${report.period}.</p>
+    </article>
+    <article class="metric-card">
+      <span>Kroky</span>
+      <strong>${formatNumber(weekly.stepsAverage)} / den</strong>
+      <p>Celkem ${formatNumber(weekly.stepsTotal)} kroků a ${weekly.distanceKm.toString().replace(".", ",")} km.</p>
+    </article>
+    <article class="metric-card">
+      <span>Intenzivní minuty</span>
+      <strong>${intensity.total}/${intensity.goal}</strong>
+      <p>${intensity.percent}% cíle, ${intensity.moderate} min střední a ${intensity.vigorous} min vysoká intenzita.</p>
+      <div class="mini-progress"><div><i style="width: ${intensityWidth}%"></i></div></div>
+    </article>
+  `;
+
+  $("#garminDailyBody").innerHTML = report.daily.map((item) => `
+    <tr>
+      <td><b>${item.day}</b><br>${item.date}</td>
+      <td>Skóre ${item.sleepScore}<br>${item.sleepDuration}</td>
+      <td>${item.hrvSevenDay} ms 7denní<br>${item.hrvNight} ms noční</td>
+      <td>${item.heartAvg} bpm průměr<br>${item.heartMax} bpm max</td>
+      <td>${item.stress}</td>
+      <td>${formatNumber(item.calories)}</td>
+    </tr>
+  `).join("");
+}
+
 function renderHistory() {
   const items = getCheckins().sort((a, b) => a.date.localeCompare(b.date));
   $("#historyBody").innerHTML = items.length ? items.map((item) => `
@@ -1313,4 +1415,5 @@ bindRecipeFilters();
 initShopping();
 initSupplements();
 bindCheckin();
+renderGarminMetrics();
 renderHistory();
