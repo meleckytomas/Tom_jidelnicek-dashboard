@@ -51,6 +51,17 @@
           <h2>Kontrolky režimu</h2>
         </div>
         <div id="metrics" class="metrics-grid"></div>
+        <div class="weekly-comparison-layout">
+          <article class="card weekly-chart-card">
+            <div>
+              <span class="pill neutral">Týdenní trend</span>
+              <h3>Srovnání s minulým dostupným stavem</h3>
+              <p id="weeklyComparisonIntro" class="muted-text"></p>
+            </div>
+            <canvas id="weeklyComparisonChart" width="900" height="280" aria-label="Graf týdenního srovnání"></canvas>
+          </article>
+          <aside id="weeklyComparisonCards" class="weekly-comparison-cards"></aside>
+        </div>
       </section>
 
       <section class="section goals" id="plan">

@@ -137,6 +137,43 @@ main { width: min(1180px, calc(100% - 32px)); margin: 0 auto 56px; }
 .metric-card span { color: var(--muted); font-size: 0.86rem; }
 .metric-card strong { display: block; font-size: 1.34rem; margin: 8px 0 6px; }
 .metric-card p { margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.45; }
+.weekly-comparison-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(300px, 0.65fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+.weekly-chart-card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+.weekly-chart-card h3 {
+  margin: 12px 0 6px;
+}
+.weekly-comparison-cards {
+  display: grid;
+  gap: 12px;
+}
+.comparison-card {
+  box-shadow: 0 12px 28px rgba(7, 24, 47, 0.07);
+}
+.comparison-card p + p {
+  margin-top: 7px;
+}
+.comparison-note {
+  padding-left: 10px;
+  border-left: 3px solid var(--line);
+}
+.comparison-note.good {
+  border-color: var(--blue);
+}
+.comparison-note.warn {
+  border-color: var(--orange);
+}
+.comparison-note.neutral {
+  border-color: var(--muted);
+}
 .garmin-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -748,7 +785,7 @@ th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-
 }
 
 @media (max-width: 900px) {
-  .hero-grid, .day-detail, .goal-grid, .two-column, .checkin-layout, .supplement-shell, .shopping-layout, .next-shopping-list { grid-template-columns: 1fr; }
+  .hero-grid, .day-detail, .goal-grid, .two-column, .checkin-layout, .supplement-shell, .shopping-layout, .next-shopping-list, .weekly-comparison-layout { grid-template-columns: 1fr; }
   .metrics-grid, .meal-grid, .recipe-grid, .supplement-weekly, .garmin-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nutrition-strip { grid-template-columns: 1fr; }
 }

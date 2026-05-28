@@ -50,6 +50,20 @@ const garminReports = [
   }
 ];
 
+const comparisonBaseline = {
+  label: "výchozí stav",
+  source: "První srovnání zatím používá původní hodnoty z dashboardu. Po dalším týdnu screenshotů se přepne na týden proti týdnu.",
+  values: {
+    sleepMinutes: 440,
+    hrv: 35,
+    heartRate: 55,
+    stress: 27,
+    stepsAverage: 12810,
+    bodyBatteryHigh: 85,
+    spo2: 95
+  }
+};
+
 const days = [
   {
     day: "Pondělí",
@@ -777,6 +791,153 @@ function renderMetrics() {
       <p>${text}</p>
     </article>
   `).join("");
+}
+
+function parseDurationToMinutes(value) {
+  const match = value.match(/(\d+)\s*h\s*(\d+)?/);
+  if (!match) return 0;
+  return Number(match[1]) * 60 + Number(match[2] || 0);
+}
+
+function minutesToSleepLabel(minutes) {
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  return `${hours} h ${mins} min`;
+}
+
+function getCurrentWeeklyValues() {
+  const report = garminReports[0];
+  return {
+    sleepMinutes: parseDurationToMinutes(report.weekly.avgSleep),
+    hrv: report.weekly.hrvSevenDayLatest,
+    heartRate: report.weekly.avgHeartRate,
+    stress: report.weekly.avgStress,
+    stepsAverage: report.weekly.stepsAverage,
+    bodyBatteryHigh: report.weekly.avgBodyBatteryHigh,
+    spo2: report.weekly.avgSpo2
+  };
+}
+
+function getPreviousWeeklyValues() {
+  const previousReport = garminReports[1];
+  if (!previousReport) return comparisonBaseline;
+  return {
+    label: previousReport.period,
+    source: "Srovnání je proti minulému nahranému týdnu.",
+    values: {
+      sleepMinutes: parseDurationToMinutes(previousReport.weekly.avgSleep),
+      hrv: previousReport.weekly.hrvSevenDayLatest,
+      heartRate: previousReport.weekly.avgHeartRate,
+      stress: previousReport.weekly.avgStress,
+      stepsAverage: previousReport.weekly.stepsAverage,
+      bodyBatteryHigh: previousReport.weekly.avgBodyBatteryHigh,
+      spo2: previousReport.weekly.avgSpo2
+    }
+  };
+}
+
+function comparisonText(metric, current, previous) {
+  const diff = current - previous;
+  const abs = Math.abs(diff);
+  if (abs < 0.1) return "beze změny";
+  const direction = diff > 0 ? "nahoru" : "dolů";
+  if (metric === "Spánek") return `${direction} o ${Math.round(abs)} min`;
+  if (metric === "Kroky") return `${direction} o ${formatNumber(Math.round(abs))} kroků/den`;
+  if (metric === "SpO2") return `${direction} o ${abs.toFixed(0)} p. b.`;
+  return `${direction} o ${abs.toFixed(0)}`;
+}
+
+function metricValueLabel(metric, value) {
+  if (metric === "Spánek") return minutesToSleepLabel(value);
+  if (metric === "Kroky") return `${formatNumber(value)} / den`;
+  if (metric === "SpO2") return `${value} %`;
+  if (metric === "HRV") return `${value} ms`;
+  if (metric === "Tep") return `${value} bpm`;
+  return String(value);
+}
+
+function renderWeeklyComparison() {
+  const current = getCurrentWeeklyValues();
+  const previous = getPreviousWeeklyValues();
+  const report = garminReports[0];
+  const comparisons = [
+    { name: "Spánek", key: "sleepMinutes", goodDirection: 1, note: "Cíl zůstává 7 h 45 min až 8 h." },
+    { name: "HRV", key: "hrv", goodDirection: 1, note: "Stabilita je důležitější než rekord." },
+    { name: "Tep", key: "heartRate", goodDirection: -1, note: "Nižší trend bývá dobrý signál regenerace." },
+    { name: "Stres", key: "stress", goodDirection: -1, note: "Nižší stres podporuje HRV i spánek." },
+    { name: "Kroky", key: "stepsAverage", goodDirection: 1, note: "Pozor jen na čtvrteční regenerační strop." },
+    { name: "Body Battery", key: "bodyBatteryHigh", goodDirection: 1, note: "Ber jako orientaci ranního dobití." },
+    { name: "SpO2", key: "spo2", goodDirection: 1, note: "Spíš kontrolka než výkonová metrika." }
+  ];
+
+  $("#weeklyComparisonIntro").textContent = `${report.period}. ${previous.source}`;
+  $("#weeklyComparisonCards").innerHTML = comparisons.map((item) => {
+    const now = current[item.key];
+    const before = previous.values[item.key];
+    const diff = now - before;
+    const tone = Math.abs(diff) < 0.1 ? "neutral" : diff * item.goodDirection > 0 ? "good" : "warn";
+    return `
+      <article class="metric-card comparison-card">
+        <span>${item.name}</span>
+        <strong>${metricValueLabel(item.name, now)}</strong>
+        <p><b>Proti ${previous.label}:</b> ${comparisonText(item.name, now, before)}.</p>
+        <p class="comparison-note ${tone}">${item.note}</p>
+      </article>
+    `;
+  }).join("");
+  drawWeeklyComparisonChart(comparisons, current, previous.values);
+}
+
+function drawWeeklyComparisonChart(comparisons, current, previous) {
+  const canvas = $("#weeklyComparisonChart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#fbfcff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = "#dbe7f5";
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 4; i++) {
+    const y = 42 + i * 52;
+    ctx.beginPath();
+    ctx.moveTo(42, y);
+    ctx.lineTo(width - 24, y);
+    ctx.stroke();
+  }
+
+  const chart = comparisons.map((item) => {
+    const now = current[item.key];
+    const before = previous[item.key];
+    const diffPercent = before ? ((now - before) / before) * 100 : 0;
+    return { ...item, diffPercent };
+  });
+  const maxAbs = Math.max(5, ...chart.map((item) => Math.abs(item.diffPercent)));
+  const zeroY = Math.round(height / 2);
+  const usableHeight = height - 92;
+  const barWidth = Math.min(58, (width - 96) / chart.length - 16);
+
+  ctx.strokeStyle = "#8ba5c8";
+  ctx.beginPath();
+  ctx.moveTo(42, zeroY);
+  ctx.lineTo(width - 24, zeroY);
+  ctx.stroke();
+
+  chart.forEach((item, index) => {
+    const x = 54 + index * ((width - 100) / chart.length);
+    const barHeight = Math.max(3, Math.abs(item.diffPercent) / maxAbs * (usableHeight / 2));
+    const positive = item.diffPercent >= 0;
+    const y = positive ? zeroY - barHeight : zeroY;
+    ctx.fillStyle = item.diffPercent * item.goodDirection >= 0 ? "#1267d8" : "#df842c";
+    ctx.fillRect(x, y, barWidth, barHeight);
+    ctx.fillStyle = "#0a1f3b";
+    ctx.font = "700 13px system-ui";
+    ctx.fillText(`${item.diffPercent > 0 ? "+" : ""}${item.diffPercent.toFixed(0)}%`, x, positive ? y - 8 : y + barHeight + 18);
+    ctx.fillStyle = "#5c6a7f";
+    ctx.font = "12px system-ui";
+    ctx.fillText(item.name, x - 2, height - 22);
+  });
 }
 
 function renderDayTabs() {
@@ -1600,6 +1761,7 @@ function bindCheckin() {
 }
 
 renderMetrics();
+renderWeeklyComparison();
 renderMealWeekSelect();
 bindMealWeekSelect();
 renderDayTabs();
