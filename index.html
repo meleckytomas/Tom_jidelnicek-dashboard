@@ -181,6 +181,10 @@
               <input id="toggleSupplementWeekly" type="checkbox" />
               <span>Adherence 7 dní</span>
             </label>
+            <label class="toggle-row">
+              <input id="toggleSupplementCards" type="checkbox" />
+              <span>Karty a nastavení</span>
+            </label>
           </div>
         </div>
         <div id="supplementDailySection" class="supplement-shell is-hidden">
@@ -208,14 +212,16 @@
           </aside>
         </div>
 
-        <div class="section-heading supplement-subheading">
-          <div>
-            <p class="eyebrow">Suplementy podle cíle</p>
-            <h2>Karty a nastavení</h2>
+        <div id="supplementCardsSection" class="is-hidden">
+          <div class="section-heading supplement-subheading">
+            <div>
+              <p class="eyebrow">Suplementy podle cíle</p>
+              <h2>Karty a nastavení</h2>
+            </div>
           </div>
+          <div id="supplementFilters" class="filters"></div>
+          <div id="supplementGrid" class="supplement-grid"></div>
         </div>
-        <div id="supplementFilters" class="filters"></div>
-        <div id="supplementGrid" class="supplement-grid"></div>
 
         <div id="supplementWeeklyHeading" class="section-heading supplement-subheading is-hidden">
           <div>

@@ -1345,7 +1345,7 @@ function saveSupplementLog(log) {
 }
 
 function getSupplementVisibility() {
-  return JSON.parse(localStorage.getItem(supplementVisibilityKey) || '{"daily":false,"weekly":false}');
+  return { daily: false, weekly: false, cards: false, ...JSON.parse(localStorage.getItem(supplementVisibilityKey) || "{}") };
 }
 
 function saveSupplementVisibility(visibility) {
@@ -1356,7 +1356,9 @@ function applySupplementVisibility() {
   const visibility = getSupplementVisibility();
   $("#toggleSupplementDaily").checked = visibility.daily;
   $("#toggleSupplementWeekly").checked = visibility.weekly;
+  $("#toggleSupplementCards").checked = visibility.cards;
   $("#supplementDailySection").classList.toggle("is-hidden", !visibility.daily);
+  $("#supplementCardsSection").classList.toggle("is-hidden", !visibility.cards);
   $("#supplementWeeklyHeading").classList.toggle("is-hidden", !visibility.weekly);
   $("#supplementWeekly").classList.toggle("is-hidden", !visibility.weekly);
 }
@@ -1371,6 +1373,12 @@ function bindSupplementVisibility() {
   $("#toggleSupplementWeekly").addEventListener("change", (event) => {
     const visibility = getSupplementVisibility();
     visibility.weekly = event.target.checked;
+    saveSupplementVisibility(visibility);
+    applySupplementVisibility();
+  });
+  $("#toggleSupplementCards").addEventListener("change", (event) => {
+    const visibility = getSupplementVisibility();
+    visibility.cards = event.target.checked;
     saveSupplementVisibility(visibility);
     applySupplementVisibility();
   });
