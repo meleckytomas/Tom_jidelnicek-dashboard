@@ -5,8 +5,9 @@ const metrics = [
   ["HRV", "40 ms", "Aktuální 7denní stav VST, noční průměr týdne cca 41 ms."],
   ["Kroky", "14 725 / den", "98 231 kroků za týden, celkem 78,4 km."],
   ["Spánek", "7 h 13 min", "Průměr 22. 5. až 28. 5.; cíl zůstává 7 h 45 min až 8 h."],
-  ["Body Battery", "80 až 90", "Tady zatím nemáme nový screenshot, nechávám původní orientační stav."],
-  ["Stres", "22", "Průměr ze screenshotů 22. 5. až 28. 5.; lepší než původní 4týdenní průměr 27."]
+  ["Body Battery", "92 / 26", "Průměr vysoké a nízké hodnoty za týden 22. 5. až 28. 5."],
+  ["Stres", "22", "Průměr ze screenshotů 22. 5. až 28. 5.; lepší než původní 4týdenní průměr 27."],
+  ["Pulzní oxymetr", "95 %", "Průměr SpO2 za týden 22. 5. až 28. 5."]
 ];
 
 const garminReports = [
@@ -22,6 +23,9 @@ const garminReports = [
       avgCalories: 2672,
       avgHeartRate: 56,
       maxHeartRate: 164,
+      avgBodyBatteryHigh: 92,
+      avgBodyBatteryLow: 26,
+      avgSpo2: 95,
       stepsTotal: 98231,
       stepsAverage: 14725,
       distanceKm: 78.4
@@ -35,13 +39,13 @@ const garminReports = [
       vigorous: 104
     },
     daily: [
-      { date: "2026-05-22", day: "pátek", sleepScore: 86, sleepDuration: "7 h 39 min", hrvSevenDay: 34, hrvNight: 34, calories: 2920, stress: 20, heartAvg: 56, heartMax: 164 },
-      { date: "2026-05-23", day: "sobota", sleepScore: 81, sleepDuration: "6 h 29 min", hrvSevenDay: 35, hrvNight: 40, calories: 2736, stress: 30, heartAvg: 57, heartMax: 138 },
-      { date: "2026-05-24", day: "neděle", sleepScore: 66, sleepDuration: "7 h 56 min", hrvSevenDay: 36, hrvNight: 32, calories: 2768, stress: 21, heartAvg: 55, heartMax: 158 },
-      { date: "2026-05-25", day: "pondělí", sleepScore: 89, sleepDuration: "7 h 27 min", hrvSevenDay: 37, hrvNight: 47, calories: 3001, stress: 20, heartAvg: 55, heartMax: 164 },
-      { date: "2026-05-26", day: "úterý", sleepScore: 72, sleepDuration: "6 h 34 min", hrvSevenDay: 38, hrvNight: 43, calories: 2906, stress: 19, heartAvg: 56, heartMax: 155 },
-      { date: "2026-05-27", day: "středa", sleepScore: 91, sleepDuration: "7 h 13 min", hrvSevenDay: 39, hrvNight: 44, calories: 2429, stress: 24, heartAvg: 56, heartMax: 107 },
-      { date: "2026-05-28", day: "čtvrtek", sleepScore: 87, sleepDuration: "7 h 11 min", hrvSevenDay: 40, hrvNight: 44, calories: 1946, stress: 19, heartAvg: 54, heartMax: 137 }
+      { date: "2026-05-22", day: "pátek", sleepScore: 86, sleepDuration: "7 h 39 min", hrvSevenDay: 34, hrvNight: 34, calories: 2920, stress: 20, heartAvg: 56, heartMax: 164, bodyBatteryHigh: 91, bodyBatteryLow: 29, spo2: 97 },
+      { date: "2026-05-23", day: "sobota", sleepScore: 81, sleepDuration: "6 h 29 min", hrvSevenDay: 35, hrvNight: 40, calories: 2736, stress: 30, heartAvg: 57, heartMax: 138, bodyBatteryHigh: 95, bodyBatteryLow: 18, spo2: 95 },
+      { date: "2026-05-24", day: "neděle", sleepScore: 66, sleepDuration: "7 h 56 min", hrvSevenDay: 36, hrvNight: 32, calories: 2768, stress: 21, heartAvg: 55, heartMax: 158, bodyBatteryHigh: 73, bodyBatteryLow: 20, spo2: 95 },
+      { date: "2026-05-25", day: "pondělí", sleepScore: 89, sleepDuration: "7 h 27 min", hrvSevenDay: 37, hrvNight: 47, calories: 3001, stress: 20, heartAvg: 55, heartMax: 164, bodyBatteryHigh: 100, bodyBatteryLow: 31, spo2: 94 },
+      { date: "2026-05-26", day: "úterý", sleepScore: 72, sleepDuration: "6 h 34 min", hrvSevenDay: 38, hrvNight: 43, calories: 2906, stress: 19, heartAvg: 56, heartMax: 155, bodyBatteryHigh: 85, bodyBatteryLow: 23, spo2: 96 },
+      { date: "2026-05-27", day: "středa", sleepScore: 91, sleepDuration: "7 h 13 min", hrvSevenDay: 39, hrvNight: 44, calories: 2429, stress: 24, heartAvg: 56, heartMax: 107, bodyBatteryHigh: 98, bodyBatteryLow: 25, spo2: 95 },
+      { date: "2026-05-28", day: "čtvrtek", sleepScore: 87, sleepDuration: "7 h 11 min", hrvSevenDay: 40, hrvNight: 44, calories: 1946, stress: 19, heartAvg: 54, heartMax: 137, bodyBatteryHigh: 99, bodyBatteryLow: 38, spo2: 96 }
     ]
   }
 ];
@@ -1405,6 +1409,16 @@ function renderGarminMetrics() {
       <p>Průměr týdne, nejvyšší den byl 30 v sobotu.</p>
     </article>
     <article class="metric-card">
+      <span>Body Battery</span>
+      <strong>${weekly.avgBodyBatteryHigh}/${weekly.avgBodyBatteryLow}</strong>
+      <p>Průměr vysoké a nízké hodnoty za týden. Čtvrtek končil nejvýš: 99/38.</p>
+    </article>
+    <article class="metric-card">
+      <span>Pulzní oxymetr</span>
+      <strong>${weekly.avgSpo2} %</strong>
+      <p>Průměr SpO2 za týden. Denní hodnoty byly v rozmezí 94 až 97 %.</p>
+    </article>
+    <article class="metric-card">
       <span>Kalorie</span>
       <strong>${formatNumber(weekly.avgCalories)}</strong>
       <p>Průměr spálených kalorií za den v období ${report.period}.</p>
@@ -1429,6 +1443,8 @@ function renderGarminMetrics() {
       <td>${item.hrvSevenDay} ms 7denní<br>${item.hrvNight} ms noční</td>
       <td>${item.heartAvg} bpm průměr<br>${item.heartMax} bpm max</td>
       <td>${item.stress}</td>
+      <td>${item.bodyBatteryHigh} vysoká<br>${item.bodyBatteryLow} nízká</td>
+      <td>${item.spo2} %</td>
       <td>${formatNumber(item.calories)}</td>
     </tr>
   `).join("");
