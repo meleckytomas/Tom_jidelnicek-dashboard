@@ -263,12 +263,110 @@ const recipes = [
   ["Proteinový krém po fotbale", "Večeře po fotbale", "Úterý večer, když je pozdě a nechceš těžké jídlo.", "Tvaroh, Nutrend Whey, kakao, ovoce.", "Tvaroh rozmíchej s půl až jednou odměrkou proteinu, kakaem a ovocem. Drž lehkou porci před spaním.", "45 až 55 g"]
 ];
 
+function inferRecipeDetails(meal, mealType) {
+  const text = `${meal.name} ${meal.note}`.toLowerCase();
+  const isRestaurant = text.includes("restaurace");
+  const ingredients = [];
+  const steps = [];
+
+  if (text.includes("kuře") || text.includes("kuřecí")) ingredients.push("kuřecí maso");
+  if (text.includes("krůt")) ingredients.push("krůtí maso");
+  if (text.includes("hovězí")) ingredients.push("hovězí maso");
+  if (text.includes("losos") || text.includes("ryba")) ingredients.push("losos nebo jiná ryba");
+  if (text.includes("tuňák")) ingredients.push("tuňák");
+  if (text.includes("krevety")) ingredients.push("krevety");
+  if (text.includes("vejce") || text.includes("omeleta")) ingredients.push("vejce");
+  if (text.includes("šunka")) ingredients.push("kvalitní šunka");
+  if (text.includes("skyr")) ingredients.push("skyr");
+  if (text.includes("tvaroh")) ingredients.push("tvaroh");
+  if (text.includes("cottage")) ingredients.push("cottage");
+  if (text.includes("kefír")) ingredients.push("kefír");
+  if (text.includes("protein")) ingredients.push("Nutrend Whey Protein");
+  if (text.includes("rýže")) ingredients.push("rýže");
+  if (text.includes("brambor") || text.includes("hranolky")) ingredients.push("brambory");
+  if (text.includes("těstoviny")) ingredients.push("těstoviny");
+  if (text.includes("kuskus")) ingredients.push("kuskus");
+  if (text.includes("wrap") || text.includes("tortilla")) ingredients.push("wrap nebo tortilla");
+  if (text.includes("kváskov")) ingredients.push("kváskový chléb");
+  if (text.includes("sushi") || text.includes("poke")) ingredients.push("sushi rýže nebo rýže do poke", "losos/tuňák/krevety", "okurka", "sójová omáčka");
+  if (text.includes("rajč")) ingredients.push("rajčata nebo passata");
+  if (text.includes("zelenin") || text.includes("salát")) ingredients.push("zelenina");
+  if (text.includes("žampiony")) ingredients.push("žampiony");
+  if (text.includes("sýr") || text.includes("parmazán") || text.includes("mozzarella")) ingredients.push("sýr nebo parmazán");
+  if (text.includes("jogurt") || text.includes("dip") || text.includes("dresink")) ingredients.push("bílý jogurt", "citron", "bylinky");
+  if (text.includes("jahod")) ingredients.push("jahody");
+  if (text.includes("borův")) ingredients.push("borůvky");
+  if (text.includes("mango")) ingredients.push("mango");
+  if (text.includes("ovoce")) ingredients.push("ovoce");
+  if (text.includes("kakao")) ingredients.push("kakao");
+  if (text.includes("med")) ingredients.push("med");
+  if (text.includes("banán")) ingredients.push("banán");
+
+  if (!ingredients.length) ingredients.push("hlavní bílkovina podle jídla", "příloha podle dne", "zelenina", "jogurtový dip");
+
+  if (isRestaurant) {
+    steps.push("Domácí varianta: zvol stejnou hlavní bílkovinu jako v restauraci a připrav ji grilovaně, na pánvi nebo v troubě.");
+  }
+  if (text.includes("pomalý hrnec")) {
+    steps.push("Maso, rajčata a zeleninu dej do pomalého hrnce, osol, okořeň a nech táhnout několik hodin.");
+  } else if (text.includes("crisp") || text.includes("brambor") || text.includes("hranolky")) {
+    steps.push("Brambory nakrájej, lehce osol a připrav ve Whirlpool Crisp nebo horkovzdušné fritéze.");
+  } else if (text.includes("smoothie") || text.includes("protein") || text.includes("skyr") || text.includes("tvaroh") || text.includes("kefír")) {
+    steps.push("Mléčný základ smíchej nebo rozmixuj s ovocem a proteinem podle potřeby.");
+  } else if (text.includes("omeleta") || text.includes("vejce")) {
+    steps.push("Vejce připrav na pánvi se zeleninou, žampiony, sýrem nebo šunkou.");
+  } else if (text.includes("těstoviny")) {
+    steps.push("Uvař těstoviny, bílkovinu krátce opeč a promíchej s rajčatovým základem.");
+  } else if (text.includes("bowl") || text.includes("rýže") || text.includes("kuskus")) {
+    steps.push("Uvař přílohu, opeč bílkovinu a vše slož do bowl se zeleninou a jogurtovým dipem.");
+  } else if (text.includes("sushi") || text.includes("poke")) {
+    steps.push("Domácí varianta: připrav rýži, přidej rybu nebo krevety, okurku, zeleninu a lehké dochucení.");
+  } else {
+    steps.push("Připrav bílkovinu jednoduše na pánvi nebo v troubě, přidej přílohu a zeleninu.");
+  }
+
+  steps.push("Drž porci v jídelním okně 16:8 a bílkoviny počítej do denního cíle 120 až 150 g.");
+
+  return {
+    ingredients: [...new Set(ingredients)].join(", "),
+    steps: steps.join(" ")
+  };
+}
+
+function getRotationRecipes() {
+  return mealRotationWeeks.flatMap((week, weekIndex) => week.meals.flatMap((dayMeals, dayIndex) => {
+    const mealTypes = [
+      ["lunch", "Oběd"],
+      ["snack", "Svačina"],
+      ["dinner", "Večeře"]
+    ];
+    return mealTypes.map(([key, label]) => {
+      const meal = dayMeals[key];
+      const details = inferRecipeDetails(meal, label);
+      return [
+        `T${weekIndex + 1} ${days[dayIndex].day} - ${label}: ${meal.name.replace("Restaurace: ", "")}`,
+        `Rotace jídel - ${label}`,
+        `${week.title}, ${days[dayIndex].day}. ${meal.note}`,
+        details.ingredients,
+        details.steps,
+        `${meal.protein} g`
+      ];
+    });
+  }));
+}
+
+function getAllRecipes() {
+  return [...recipes, ...getRotationRecipes()];
+}
+
 const shoppingCategories = ["Vše", "Bílkoviny", "Mléčné", "Sacharidy a přílohy", "Ovoce", "Zelenina", "Dochucení", "Rychlé záchrany", "Suplementy"];
 
 const baseShoppingItems = [
   { id: "chicken-turkey", name: "Kuře nebo krůta", category: "Bílkoviny", amount: "1 až 2 kg", frequency: "týdně", note: "Bowl, rizoto, rýže se zeleninou, jídlo do práce." },
   { id: "salmon", name: "Losos", category: "Bílkoviny", amount: "2 porce", frequency: "týdně", note: "Středa nebo sobota, dobré i kvůli omega 3." },
+  { id: "shrimp", name: "Krevety", category: "Bílkoviny", amount: "1 až 2 balení", frequency: "podle týdne", note: "Krevetové těstoviny, bowl, poke nebo domácí sushi varianta." },
   { id: "tuna", name: "Tuňák", category: "Bílkoviny", amount: "2 až 4 konzervy", frequency: "týdně", note: "Rychlé těstoviny, záchrana do práce." },
+  { id: "beef", name: "Hovězí maso", category: "Bílkoviny", amount: "1 balení", frequency: "podle rotace", note: "Pomalý hrnec, maso na zelenině." },
   { id: "eggs", name: "Vejce", category: "Bílkoviny", amount: "10 až 15 ks", frequency: "týdně", note: "Večeře, omeleta, salát, po fotbale." },
   { id: "ham", name: "Kvalitní šunka", category: "Bílkoviny", amount: "1 až 2 balení", frequency: "týdně", note: "Toast, kváskový chléb, rychlá večeře." },
   { id: "skyr", name: "Skyr", category: "Mléčné", amount: "4 až 6 ks", frequency: "týdně", note: "Svačina, sladká řízená varianta, doplnění bílkovin." },
@@ -276,8 +374,10 @@ const baseShoppingItems = [
   { id: "cottage", name: "Cottage", category: "Mléčné", amount: "2 až 4 ks", frequency: "týdně", note: "Kváskový chléb, svačina, večeře." },
   { id: "kefir", name: "Kefír", category: "Mléčné", amount: "2 až 4 lahve", frequency: "týdně", note: "Před fotbalem, smoothie, trávení." },
   { id: "yogurt", name: "Bílý jogurt", category: "Mléčné", amount: "1 velké balení", frequency: "týdně", note: "Dip, dresink, bowl." },
+  { id: "mozzarella-feta", name: "Mozzarella nebo feta", category: "Mléčné", amount: "1 až 2 ks", frequency: "podle týdne", note: "Caprese, řecký salát, středomořské večeře." },
   { id: "sourdough", name: "Kváskový chléb / pečivo", category: "Sacharidy a přílohy", amount: "1 až 2 ks", frequency: "týdně", note: "Večeře, toast před fotbalem." },
   { id: "rice", name: "Rýže", category: "Sacharidy a přílohy", amount: "zásoba", frequency: "průběžně", note: "Kuře, bowl, pomalý hrnec." },
+  { id: "sushi-rice", name: "Sushi rýže / poke rýže", category: "Sacharidy a přílohy", amount: "zásoba", frequency: "podle chuti", note: "Domácí sushi nebo poke bowl s lososem, tuňákem či krevetami." },
   { id: "pasta", name: "Těstoviny", category: "Sacharidy a přílohy", amount: "2 balení", frequency: "týdně", note: "Tuňák, losos, rajčatová omáčka." },
   { id: "potatoes", name: "Brambory", category: "Sacharidy a přílohy", amount: "2 až 3 kg", frequency: "týdně", note: "Americké brambory, hranolky, příloha." },
   { id: "couscous", name: "Kuskus", category: "Sacharidy a přílohy", amount: "1 balení", frequency: "průběžně", note: "Rychlá bowl varianta." },
@@ -290,7 +390,12 @@ const baseShoppingItems = [
   { id: "cucumber", name: "Okurka", category: "Zelenina", amount: "1 až 2 ks", frequency: "týdně", note: "Večeře, chléb, saláty." },
   { id: "frozen-veg", name: "Mražená zelenina", category: "Zelenina", amount: "2 balení", frequency: "týdně", note: "Rizoto, rychlá příloha, záchrana." },
   { id: "root-veg", name: "Kořenová zelenina", category: "Zelenina", amount: "1 balení", frequency: "týdně", note: "Pomalý hrnec, vývar, maso na zelenině." },
+  { id: "mushrooms", name: "Žampiony", category: "Zelenina", amount: "1 balení", frequency: "podle týdne", note: "Omeleta, jediná houbová varianta, kterou chceš v plánu." },
   { id: "parmesan-cheese", name: "Parmazán / tvrdý sýr", category: "Dochucení", amount: "1 ks", frequency: "průběžně", note: "Těstoviny, rizoto, wrap." },
+  { id: "olive-oil", name: "Olivový olej", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Středomořská kuchyně, saláty, ryby, krevety." },
+  { id: "lemon", name: "Citron", category: "Dochucení", amount: "2 až 4 ks", frequency: "týdně", note: "Jogurtové dipy, ryby, krevety, saláty." },
+  { id: "herbs", name: "Bylinky", category: "Dochucení", amount: "čerstvé nebo sušené", frequency: "průběžně", note: "Jogurtový dip, ryby, brambory, saláty." },
+  { id: "soy-sauce", name: "Sójová omáčka", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Sushi a poke varianta." },
   { id: "cocoa", name: "Kakao", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Tvaroh s kakaem místo náhodného sladkého." },
   { id: "honey", name: "Med", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Malé množství do skyru nebo tvarohu." },
   { id: "cinnamon", name: "Skořice", category: "Dochucení", amount: "zásoba", frequency: "průběžně", note: "Kefír, ovoce, tvaroh." },
@@ -701,11 +806,12 @@ function renderMealBlock(meal, label) {
 }
 
 function renderRecipes(active = "Vše") {
-  const categories = ["Vše", ...new Set(recipes.map((recipe) => recipe[1]))];
+  const allRecipes = getAllRecipes();
+  const categories = ["Vše", ...new Set(allRecipes.map((recipe) => recipe[1]))];
   $("#recipeFilters").innerHTML = categories.map((category) => `
     <button class="filter ${category === active ? "active" : ""}" type="button" data-category="${category}">${category}</button>
   `).join("");
-  const visible = active === "Vše" ? recipes : recipes.filter((recipe) => recipe[1] === active);
+  const visible = active === "Vše" ? allRecipes : allRecipes.filter((recipe) => recipe[1] === active);
   $("#recipeGrid").innerHTML = visible.map(([name, category, when, ingredients, steps, protein]) => `
     <article class="recipe-card">
       <span class="pill neutral">${category}</span>
@@ -713,7 +819,7 @@ function renderRecipes(active = "Vše") {
       <p><b>Kdy se hodí:</b> ${when}</p>
       <p><b>Suroviny:</b> ${ingredients}</p>
       <p><b>Postup:</b> ${steps}</p>
-      <p><b>Bílkoviny:</b> ${protein}</p>
+      <p><b>Bílkoviny:</b> <span class="protein-badge ${proteinClass(parseInt(protein, 10) || 0)}">${protein}</span></p>
     </article>
   `).join("");
 }
