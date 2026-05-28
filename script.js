@@ -792,6 +792,7 @@ function bindMealWeekSelect() {
     localStorage.setItem(mealWeekKey, event.target.value);
     renderMealWeekSelect();
     renderMeals();
+    renderNextWeekShoppingList();
     const activeDay = document.querySelector(".tab.active");
     renderDay(Number(activeDay?.dataset.day || 0));
   });
@@ -925,6 +926,125 @@ function renderShoppingList(active = "Vše") {
     }).join("");
 }
 
+const mealIngredientRules = [
+  ["chicken-turkey", ["kuř", "krůt"]],
+  ["beef", ["hověz"]],
+  ["salmon", ["losos", "ryba"]],
+  ["shrimp", ["krevet"]],
+  ["tuna", ["tuňák"]],
+  ["eggs", ["vejce", "omelet"]],
+  ["ham", ["šunk"]],
+  ["skyr", ["skyr"]],
+  ["curd", ["tvaroh"]],
+  ["cottage", ["cottage"]],
+  ["kefir", ["kefír", "kefir"]],
+  ["yogurt", ["jogurt", "dip", "dresink"]],
+  ["mozzarella-feta", ["mozzarella", "feta", "řecký salát", "sýr"]],
+  ["sourdough", ["kváskov", "toast"]],
+  ["rice", ["rýže", "rizoto", "bowl"]],
+  ["sushi-rice", ["sushi", "poke"]],
+  ["pasta", ["těstovin"]],
+  ["potatoes", ["brambor", "hranol"]],
+  ["couscous", ["kuskus"]],
+  ["wraps", ["wrap", "tortilla"]],
+  ["bananas", ["banán"]],
+  ["berries", ["jahod", "borůvk", "ovoce"]],
+  ["mango", ["mango"]],
+  ["apples", ["sezónní ovoce", "jabl"]],
+  ["leafy", ["salát", "zelenina"]],
+  ["tomatoes", ["rajč"]],
+  ["cucumber", ["okurk", "sushi", "poke"]],
+  ["frozen-veg", ["hrášek", "mražen"]],
+  ["root-veg", ["kořenová", "vývar"]],
+  ["mushrooms", ["žampion"]],
+  ["parmesan-cheese", ["parmazán", "tvrdý sýr"]],
+  ["olive-oil", ["středomoř", "oliv", "losos", "krevet", "salát"]],
+  ["lemon", ["citron", "losos", "krevet", "dip"]],
+  ["herbs", ["bylink", "dip", "dresink"]],
+  ["soy-sauce", ["sushi", "poke"]],
+  ["cocoa", ["kakao"]],
+  ["honey", ["med"]],
+  ["cinnamon", ["skořic"]],
+  ["tomato-passata", ["rajčatová omáčka", "passata", "rajčaty"]],
+  ["protein-powder", ["protein"]],
+  ["electrolytes-stock", ["fotbal", "zóna 2", "běh", "kolo"]]
+];
+
+function mealTextForIngredients(meal) {
+  return `${meal.name} ${meal.note || ""}`.toLowerCase();
+}
+
+function getIngredientIdsForMeal(meal) {
+  const text = mealTextForIngredients(meal);
+  return mealIngredientRules
+    .filter(([, tokens]) => tokens.some((token) => text.includes(token)))
+    .map(([id]) => id);
+}
+
+function getNextMealWeekIndex() {
+  return (getSelectedMealWeekIndex() + 1) % mealRotationWeeks.length;
+}
+
+function buildNextWeekShoppingList() {
+  const weekIndex = getNextMealWeekIndex();
+  const week = mealRotationWeeks[weekIndex];
+  const catalog = new Map(baseShoppingItems.map((item) => [item.id, item]));
+  const usage = new Map();
+  const mealLabels = { lunch: "oběd", snack: "svačina", dinner: "večeře" };
+
+  week.meals.forEach((dayMeals, dayIndex) => {
+    Object.entries(dayMeals).forEach(([mealType, meal]) => {
+      getIngredientIdsForMeal(meal).forEach((id) => {
+        if (!catalog.has(id)) return;
+        const current = usage.get(id) || { ...catalog.get(id), count: 0, uses: [] };
+        current.count += 1;
+        current.uses.push(`${days[dayIndex].day} ${mealLabels[mealType]}: ${meal.name.replace("Restaurace: ", "")}`);
+        usage.set(id, current);
+      });
+    });
+  });
+
+  const items = [...usage.values()].sort((a, b) => {
+    const categoryOrder = shoppingCategories.indexOf(a.category) - shoppingCategories.indexOf(b.category);
+    return categoryOrder || b.count - a.count || a.name.localeCompare(b.name, "cs");
+  });
+
+  return { week, items };
+}
+
+function renderNextWeekShoppingList() {
+  const target = $("#nextWeekShoppingList");
+  const summary = $("#nextShoppingSummary");
+  if (!target || !summary) return;
+
+  const { week, items } = buildNextWeekShoppingList();
+  summary.textContent = `${week.title}. Vygenerováno z obědů, svačin a večeří v rotaci.`;
+
+  target.innerHTML = shoppingCategories
+    .filter((category) => category !== "Vše")
+    .map((category) => {
+      const categoryItems = items.filter((item) => item.category === category);
+      if (!categoryItems.length) return "";
+      return `
+        <section class="next-shopping-category">
+          <h4>${category}</h4>
+          <div>
+            ${categoryItems.map((item) => `
+              <article class="next-shopping-item">
+                <div>
+                  <strong>${item.name}</strong>
+                  <small>${item.amount || "dle potřeby"} · ${item.frequency || "průběžně"} · ${item.count}× v plánu</small>
+                </div>
+                <p>${item.note || ""}</p>
+                <em>${item.uses.slice(0, 2).join("<br>")}${item.uses.length > 2 ? "<br>+ další jídla v týdnu" : ""}</em>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      `;
+    }).join("");
+}
+
 function initShopping() {
   const categorySelect = $("#shoppingForm select[name='category']");
   categorySelect.innerHTML = shoppingCategories
@@ -933,6 +1053,7 @@ function initShopping() {
     .join("");
 
   renderShoppingFilters();
+  renderNextWeekShoppingList();
   $("#shoppingFilters").addEventListener("click", (event) => {
     const button = event.target.closest("button");
     if (button) renderShoppingFilters(button.dataset.shoppingCategory);

@@ -377,6 +377,70 @@ main { width: min(1180px, calc(100% - 32px)); margin: 0 auto 56px; }
   font-weight: 800;
 }
 
+.next-shopping-card {
+  margin-top: 18px;
+  overflow: hidden;
+}
+.next-shopping-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+.next-shopping-head h3 {
+  margin: 12px 0 6px;
+}
+.next-shopping-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.next-shopping-category {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  background: #f8fbff;
+}
+.next-shopping-category h4 {
+  margin: 0;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--blue-soft);
+  font-size: 0.95rem;
+}
+.next-shopping-category > div {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+.next-shopping-item {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid rgba(223, 230, 225, 0.9);
+  border-radius: 12px;
+  background: #fff;
+}
+.next-shopping-item strong,
+.next-shopping-item small,
+.next-shopping-item em {
+  display: block;
+}
+.next-shopping-item small,
+.next-shopping-item p,
+.next-shopping-item em {
+  color: var(--muted);
+  line-height: 1.35;
+}
+.next-shopping-item p {
+  margin: 0;
+}
+.next-shopping-item em {
+  font-size: 0.82rem;
+  font-style: normal;
+}
+
 .form-card label { display: grid; gap: 7px; color: var(--muted); font-weight: 800; font-size: 0.9rem; }
 .form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
 input, textarea {
@@ -684,7 +748,7 @@ th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-
 }
 
 @media (max-width: 900px) {
-  .hero-grid, .day-detail, .goal-grid, .two-column, .checkin-layout, .supplement-shell, .shopping-layout { grid-template-columns: 1fr; }
+  .hero-grid, .day-detail, .goal-grid, .two-column, .checkin-layout, .supplement-shell, .shopping-layout, .next-shopping-list { grid-template-columns: 1fr; }
   .metrics-grid, .meal-grid, .recipe-grid, .supplement-weekly, .garmin-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nutrition-strip { grid-template-columns: 1fr; }
 }
