@@ -542,6 +542,9 @@ textarea { resize: vertical; margin-bottom: 14px; }
   width: 18px;
   height: 18px;
 }
+.recipe-toggle {
+  min-width: max-content;
+}
 .supplement-shell {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);

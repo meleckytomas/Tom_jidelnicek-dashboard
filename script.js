@@ -781,6 +781,7 @@ const supplementLogKey = "tomasSupplementLogV2";
 const supplementVisibilityKey = "tomasSupplementVisibilityV2";
 const shoppingStateKey = "tomasShoppingStateV2";
 const customShoppingKey = "tomasCustomShoppingV2";
+const recipesVisibilityKey = "tomasRecipesVisibilityV1";
 const $ = (selector) => document.querySelector(selector);
 
 function renderMetrics() {
@@ -1077,6 +1078,19 @@ function bindRecipeFilters() {
   $("#recipeFilters").addEventListener("click", (event) => {
     const button = event.target.closest("button");
     if (button) renderRecipes(button.dataset.category);
+  });
+}
+
+function applyRecipesVisibility() {
+  const visible = localStorage.getItem(recipesVisibilityKey) === "true";
+  $("#toggleRecipes").checked = visible;
+  $("#recipesSection").classList.toggle("is-hidden", !visible);
+}
+
+function bindRecipesVisibility() {
+  $("#toggleRecipes").addEventListener("change", (event) => {
+    localStorage.setItem(recipesVisibilityKey, String(event.target.checked));
+    applyRecipesVisibility();
   });
 }
 
@@ -1784,6 +1798,8 @@ bindMealWeekSelect();
 renderDayTabs();
 renderMeals();
 renderRecipes();
+applyRecipesVisibility();
+bindRecipesVisibility();
 bindRecipeFilters();
 initShopping();
 initSupplements();

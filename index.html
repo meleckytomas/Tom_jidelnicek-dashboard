@@ -158,12 +158,20 @@
       </section>
 
       <section class="section" id="recepty">
-        <div class="section-heading">
-          <p class="eyebrow">Receptová složka</p>
-          <h2>Rychlá rozhodnutí bez ořechů</h2>
+        <div class="section-heading inline-heading">
+          <div>
+            <p class="eyebrow">Receptová složka</p>
+            <h2>Rychlá rozhodnutí bez ořechů</h2>
+          </div>
+          <label class="toggle-row recipe-toggle">
+            <input id="toggleRecipes" type="checkbox" />
+            <span>Zobrazit recepty</span>
+          </label>
         </div>
-        <div id="recipeFilters" class="filters"></div>
-        <div id="recipeGrid" class="recipe-grid"></div>
+        <div id="recipesSection" class="is-hidden">
+          <div id="recipeFilters" class="filters"></div>
+          <div id="recipeGrid" class="recipe-grid"></div>
+        </div>
       </section>
 
       <section class="section" id="suplementace">
