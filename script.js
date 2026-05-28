@@ -994,10 +994,16 @@ function proteinBadge(protein) {
 
 function renderMealWeekSelect() {
   const selected = getSelectedMealWeekIndex();
+  const currentAuto = getAutoMealWeekIndex();
   $("#mealWeekSelect").innerHTML = mealRotationWeeks.map((week, index) => `
     <option value="${index}" ${index === selected ? "selected" : ""}>${week.title}</option>
   `).join("");
-  $("#mealWeekSummary").textContent = mealRotationWeeks[selected].focus;
+  $("#currentMealWeekBadge").textContent = selected === currentAuto
+    ? `Aktuální: ${mealRotationWeeks[selected].title}`
+    : `Vybráno: ${mealRotationWeeks[selected].title}`;
+  $("#mealWeekSummary").textContent = selected === currentAuto
+    ? mealRotationWeeks[selected].focus
+    : `${mealRotationWeeks[selected].focus} Ručně vybraný týden, nákup se počítá podle něj.`;
 }
 
 function bindMealWeekSelect() {
