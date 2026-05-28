@@ -857,6 +857,9 @@ function metricValueLabel(metric, value) {
 }
 
 function renderWeeklyComparison() {
+  const intro = $("#weeklyComparisonIntro");
+  const cards = $("#weeklyComparisonCards");
+  if (!intro || !cards) return;
   const current = getCurrentWeeklyValues();
   const previous = getPreviousWeeklyValues();
   const report = garminReports[0];
@@ -870,8 +873,8 @@ function renderWeeklyComparison() {
     { name: "SpO2", key: "spo2", goodDirection: 1, note: "Spíš kontrolka než výkonová metrika." }
   ];
 
-  $("#weeklyComparisonIntro").textContent = `${report.period}. ${previous.source}`;
-  $("#weeklyComparisonCards").innerHTML = comparisons.map((item) => {
+  intro.textContent = `${report.period}. ${previous.source}`;
+  cards.innerHTML = comparisons.map((item) => {
     const now = current[item.key];
     const before = previous.values[item.key];
     const diff = now - before;
@@ -964,7 +967,13 @@ function getAutoMealWeekIndex() {
 
 function getSelectedMealWeekIndex() {
   const saved = localStorage.getItem(mealWeekKey);
-  return saved === null ? getAutoMealWeekIndex() : Number(saved);
+  if (saved === null) return getAutoMealWeekIndex();
+  const parsed = Number(saved);
+  if (!Number.isInteger(parsed) || parsed < 0 || parsed >= mealRotationWeeks.length) {
+    localStorage.removeItem(mealWeekKey);
+    return getAutoMealWeekIndex();
+  }
+  return parsed;
 }
 
 function getMealForDay(dayIndex) {
