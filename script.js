@@ -785,6 +785,167 @@ const plannedShoppingStateKey = "tomasPlannedShoppingStateV1";
 const recipesVisibilityKey = "tomasRecipesVisibilityV1";
 const $ = (selector) => document.querySelector(selector);
 
+function getReadiness() {
+  const current = getCurrentWeeklyValues();
+  const previous = getPreviousWeeklyValues().values;
+  const today = days[getTodayIndex()];
+  let score = 72;
+  const reasons = [];
+
+  if (current.hrv >= previous.hrv + 3) {
+    score += 10;
+    reasons.push("HRV je nad výchozím stavem.");
+  } else if (current.hrv < previous.hrv - 2) {
+    score -= 12;
+    reasons.push("HRV je níž než minulý dostupný stav.");
+  }
+
+  if (current.sleepMinutes >= 465) {
+    score += 8;
+    reasons.push("Spánek je v cílovém pásmu.");
+  } else if (current.sleepMinutes < 420) {
+    score -= 12;
+    reasons.push("Spánek je pod 7 hodin.");
+  } else {
+    score -= 4;
+    reasons.push("Spánek je slušný, ale pod cílem 7 h 45 min.");
+  }
+
+  if (current.heartRate > previous.heartRate + 2) {
+    score -= 9;
+    reasons.push("Tep je proti srovnání výš.");
+  } else if (current.heartRate <= previous.heartRate) {
+    score += 6;
+    reasons.push("Klidový tep nepůsobí jako varování.");
+  }
+
+  if (current.stress <= 23) {
+    score += 7;
+    reasons.push("Stres je nízký.");
+  } else if (current.stress >= 30) {
+    score -= 10;
+    reasons.push("Stres je vyšší, regenerace může být dražší.");
+  }
+
+  if (current.bodyBatteryHigh >= 90) score += 6;
+  if (["football", "endurance"].includes(today.type)) score -= 5;
+  if (today.type === "recovery") score += 5;
+
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const tone = score >= 78 ? "good" : score >= 58 ? "warn" : "alert";
+  const label = score >= 78 ? "Zelená" : score >= 58 ? "Oranžová" : "Červená";
+  const advice = score >= 78
+    ? "Drž plán. Když je chuť přidat, přidej raději kvalitu než další intenzitu."
+    : score >= 58
+      ? "Plán drž, ale volitelné výklusy a extra intenzitu nech stranou."
+      : "Uber zátěž. Dnes vyhraj regenerací, ne silou vůle.";
+
+  return { score, tone, label, advice, reasons, today };
+}
+
+function getTrainingRisk(day) {
+  const readiness = getReadiness();
+  let points = 0;
+  const reasons = [];
+  if (["football", "endurance"].includes(day.type)) {
+    points += 2;
+    reasons.push("den má vyšší intenzitu");
+  }
+  if (day.type === "strength") {
+    points += 1;
+    reasons.push("silový trénink vyžaduje kvalitní regeneraci");
+  }
+  if (readiness.score < 58) {
+    points += 2;
+    reasons.push("readiness je nízká");
+  } else if (readiness.score < 78) {
+    points += 1;
+    reasons.push("readiness je střední");
+  }
+  if (day.type === "recovery") points = Math.max(0, points - 2);
+  const tone = points >= 4 ? "alert" : points >= 2 ? "warn" : "good";
+  const label = points >= 4 ? "Vyšší riziko" : points >= 2 ? "Hlídat zátěž" : "Nízké riziko";
+  const advice = points >= 4
+    ? "Nech jen hlavní plán a škrtni všechno volitelné."
+    : points >= 2
+      ? "Trénuj, ale bez honění objemu a bez další intenzity."
+      : "Den může běžet podle plánu.";
+  return { tone, label, advice, reasons };
+}
+
+function getWeekProteinStats() {
+  const week = mealRotationWeeks[getSelectedMealWeekIndex()];
+  const daily = week.meals.map((meal, index) => {
+    const total = meal.lunch.protein + meal.snack.protein + meal.dinner.protein;
+    return { day: days[index].day, total, meals: meal };
+  });
+  const average = Math.round(daily.reduce((sum, item) => sum + item.total, 0) / daily.length);
+  const lowDays = daily.filter((item) => item.total < 120);
+  const highDays = daily.filter((item) => item.total > 155);
+  return { week, daily, average, lowDays, highDays };
+}
+
+function getNutritionScore() {
+  const stats = getWeekProteinStats();
+  const text = stats.week.meals.map((dayMeals) => Object.values(dayMeals).map((meal) => `${meal.name} ${meal.note}`).join(" ")).join(" ").toLowerCase();
+  let score = 65;
+  const notes = [];
+  if (stats.average >= 120 && stats.average <= 150) {
+    score += 16;
+    notes.push(`Průměr bílkovin je ${stats.average} g/den, tedy v cílovém pásmu.`);
+  } else if (stats.average < 120) {
+    score -= 10;
+    notes.push(`Průměr bílkovin je ${stats.average} g/den. Přidej protein, tvaroh, skyr nebo větší porci masa.`);
+  } else {
+    score += 4;
+    notes.push(`Bílkoviny jsou vysoko (${stats.average} g/den). Je to v pořádku, jen hlídej pestrost.`);
+  }
+  if (text.includes("losos") || text.includes("tuňák") || text.includes("krevety") || text.includes("sushi")) {
+    score += 7;
+    notes.push("Ryby nebo mořské jídlo v týdnu podporují pestrost a omega 3 směr.");
+  }
+  if (text.includes("zelenina") || text.includes("salát")) {
+    score += 7;
+    notes.push("Zelenina je v plánu prakticky každý den.");
+  }
+  if (text.includes("skyr") || text.includes("tvaroh") || text.includes("kefír")) {
+    score += 5;
+    notes.push("Řízené sladké a mléčné bílkoviny jsou připravené předem.");
+  }
+  if (stats.lowDays.length) {
+    score -= stats.lowDays.length * 3;
+    notes.push(`Dny pod 120 g: ${stats.lowDays.map((item) => item.day).join(", ")}.`);
+  }
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  const tone = score >= 80 ? "good" : score >= 65 ? "warn" : "alert";
+  return { score, tone, notes, stats };
+}
+
+function getMealAlternatives(meal, dayIndex, type) {
+  const allMeals = mealRotationWeeks.flatMap((week) => week.meals.map((dayMeals) => dayMeals[type]));
+  const lower = meal.name.toLowerCase();
+  const tokens = ["kuř", "krůt", "losos", "tuňák", "krevet", "vejce", "tvaroh", "skyr", "cottage", "brambor", "rýže", "těstovin"];
+  const scored = allMeals
+    .filter((candidate) => candidate.name !== meal.name)
+    .map((candidate) => {
+      const candidateText = candidate.name.toLowerCase();
+      const overlap = tokens.filter((token) => lower.includes(token) && candidateText.includes(token)).length;
+      const proteinGap = Math.abs(candidate.protein - meal.protein);
+      return { candidate, score: overlap * 10 - proteinGap };
+    })
+    .sort((a, b) => b.score - a.score || Math.abs(a.candidate.protein - meal.protein) - Math.abs(b.candidate.protein - meal.protein))
+    .slice(0, 2)
+    .map((item) => item.candidate);
+  return scored.length ? scored : mealRotationWeeks[getSelectedMealWeekIndex()].meals
+    .filter((_, index) => index !== dayIndex)
+    .map((dayMeals) => dayMeals[type])
+    .slice(0, 2);
+}
+
+function formatTodayLabel() {
+  return new Intl.DateTimeFormat("cs-CZ", { weekday: "long", day: "numeric", month: "numeric" }).format(new Date());
+}
+
 function renderMetrics() {
   $("#metrics").innerHTML = metrics.map(([name, value, text]) => `
     <article class="metric-card">
@@ -793,6 +954,125 @@ function renderMetrics() {
       <p>${text}</p>
     </article>
   `).join("");
+}
+
+function renderTodayCoach() {
+  const todayIndex = getTodayIndex();
+  const day = days[todayIndex];
+  const meals = getMealForDay(todayIndex);
+  const readiness = getReadiness();
+  const risk = getTrainingRisk(day);
+  const nutrition = getNutritionScore();
+  const supplementPlan = getDaySupplementPlan(todayIndex);
+
+  $("#todayGrid").innerHTML = `
+    <article class="today-card">
+      <span class="pill ${day.type}">${formatTodayLabel()}</span>
+      <h3>${day.day}: ${day.label}</h3>
+      <p>${day.training}</p>
+      <div class="mini-meta">
+        <span>${risk.label}</span>
+        <span>${readiness.label} readiness</span>
+      </div>
+    </article>
+    <article class="today-card">
+      <span class="pill neutral">Jídlo dnes</span>
+      <h3>${meals.lunch.protein + meals.snack.protein + meals.dinner.protein} g bílkovin v plánu</h3>
+      <p><b>Oběd:</b> ${meals.lunch.name}</p>
+      <p><b>Svačina:</b> ${meals.snack.name}</p>
+      <p><b>Večeře:</b> ${meals.dinner.name}</p>
+    </article>
+    <article class="today-card">
+      <span class="pill good">Suplementy</span>
+      <h3>${supplementPlan.length} položek podle dne</h3>
+      <p>${supplementPlan.slice(0, 5).map((item) => item.name).join(", ")}${supplementPlan.length > 5 ? "..." : ""}</p>
+      <p class="muted-text">Detail je schovaný pod přepínačem v sekci Suplementace.</p>
+    </article>
+  `;
+
+  $("#readinessCard").innerHTML = `
+    <span class="pill ${readiness.tone}">Readiness semafor</span>
+    <h3>${readiness.label}: ${readiness.score}/100</h3>
+    <div class="score-ring ${readiness.tone}" style="--score:${readiness.score}">
+      <strong>${readiness.score}</strong>
+      <span>${readiness.label}</span>
+    </div>
+    <p>${readiness.advice}</p>
+    <ul class="clean-list">${readiness.reasons.slice(0, 4).map((reason) => `<li>${reason}</li>`).join("")}</ul>
+  `;
+
+  $("#coachBriefing").innerHTML = `
+    <span class="pill neutral">Týdenní koučovací briefing</span>
+    <h3>Co udělat příštích pár dní</h3>
+    <ul class="clean-list">
+      <li>${risk.advice}</li>
+      <li>${readiness.score >= 78 ? "Drž silový plán 3x týdně a fotbal dál počítej jako tvrdou intenzitu." : "Volitelný výklus škrtni, dokud se nezvedne spánek nebo pocit energie."}</li>
+      <li>${nutrition.stats.lowDays.length ? "U dnů s nižším proteinem přidej skyr, tvaroh nebo půl až jednu odměrku proteinu." : "Proteinový základ týdne je připravený dobře."}</li>
+      <li>Čtvrtek nech opravdu volnější. Tady se kupuje lepší pátek a víkend.</li>
+    </ul>
+  `;
+
+  $("#nutritionScoreCard").innerHTML = `
+    <span class="pill ${nutrition.tone}">Nutriční skóre týdne</span>
+    <h3>${nutrition.score}/100</h3>
+    <div class="mini-progress"><div><i style="width:${nutrition.score}%"></i></div></div>
+    <p><b>Průměr:</b> ${nutrition.stats.average} g bílkovin denně v aktuální rotaci.</p>
+    <ul class="clean-list">${nutrition.notes.slice(0, 4).map((note) => `<li>${note}</li>`).join("")}</ul>
+  `;
+}
+
+function renderMealPrep() {
+  const { week, items } = buildNextWeekShoppingList();
+  const stats = getWeekProteinStats();
+  const prepMeals = week.meals.flatMap((dayMeals, index) => {
+    return Object.values(dayMeals)
+      .filter((meal) => /pomal|bowl|crisp|brambor|rýže|těstovin|hrnec/i.test(`${meal.name} ${meal.note}`))
+      .map((meal) => `${days[index].day}: ${meal.name.replace("Restaurace: ", "")}`);
+  }).slice(0, 5);
+  const freshItems = items.filter((item) => ["Zelenina", "Ovoce", "Mléčné"].includes(item.category)).slice(0, 6);
+  const pantryItems = items.filter((item) => ["Sacharidy a přílohy", "Luštěniny a konzervy", "Dochucení"].includes(item.category)).slice(0, 6);
+
+  $("#mealPrepCard").innerHTML = `
+    <div class="meal-prep-head">
+      <div>
+        <span class="pill neutral">Meal-prep režim</span>
+        <h3>Co připravit, aby týden jel lehčeji</h3>
+        <p class="muted-text">${week.title}. Průměr bílkovin v plánu: ${stats.average} g/den.</p>
+      </div>
+    </div>
+    <div class="meal-prep-grid">
+      <div>
+        <h4>Uvařit do zásoby</h4>
+        <ul class="clean-list">${prepMeals.map((item) => `<li>${item}</li>`).join("")}</ul>
+      </div>
+      <div>
+        <h4>Koupit čerstvé</h4>
+        <ul class="clean-list">${freshItems.map((item) => `<li>${item.name}</li>`).join("")}</ul>
+      </div>
+      <div>
+        <h4>Zkontrolovat zásobu</h4>
+        <ul class="clean-list">${pantryItems.map((item) => `<li>${item.name}</li>`).join("")}</ul>
+      </div>
+    </div>
+  `;
+}
+
+function renderImportProtocol() {
+  const report = garminReports[0];
+  $("#importProtocol").innerHTML = `
+    <article class="card import-card">
+      <span class="pill neutral">Import screenshotů</span>
+      <h3>Týdenní protokol</h3>
+      <p>Každý týden sem nahraješ screenshoty z Garminu a váhy do Codexu. Já z nich vytáhnu hodnoty, ručně je potvrdíme a zapíšu je do dashboardu.</p>
+      <div class="protocol-steps">
+        <span>1. Screenshoty</span>
+        <span>2. Kontrola hodnot</span>
+        <span>3. Zápis do kódu</span>
+        <span>4. Trendy a doporučení</span>
+      </div>
+      <p class="muted-text">Poslední nahrané období: ${report.period}. Váha a pas zůstávají pro pondělní check-in.</p>
+    </article>
+  `;
 }
 
 function parseDurationToMinutes(value) {
@@ -1010,6 +1290,8 @@ function bindMealWeekSelect() {
   $("#mealWeekSelect").addEventListener("change", (event) => {
     localStorage.setItem(mealWeekKey, event.target.value);
     renderMealWeekSelect();
+    renderTodayCoach();
+    renderMealPrep();
     renderMeals();
     renderNextWeekShoppingList();
     const activeDay = document.querySelector(".tab.active");
@@ -1020,23 +1302,44 @@ function bindMealWeekSelect() {
 function renderDay(index) {
   const item = days[index];
   const meal = getMealForDay(index);
+  const risk = getTrainingRisk(item);
   $("#dayDetail").innerHTML = `
     <section>
       <div class="day-meta">
         <span class="pill ${item.type}">${item.label}</span>
         ${item.type === "football" ? '<span class="pill alert">Počítat jako tvrdý trénink</span>' : ""}
+        <span class="pill ${risk.tone}">${risk.label}</span>
       </div>
       <h3>${item.day}</h3>
       <p>${item.training}</p>
       <div class="focus-box"><strong>Cíl dne:</strong> ${item.goal}</div>
+      <div class="risk-box ${risk.tone}">
+        <strong>Tréninkové riziko:</strong> ${risk.advice}
+        <small>${risk.reasons.length ? `Důvod: ${risk.reasons.join(", ")}.` : "Signály vypadají klidně."}</small>
+      </div>
     </section>
     <aside>
       <h3>Jídlo</h3>
-      <p><b>Oběd:</b> ${meal.lunch.name} ${proteinBadge(meal.lunch.protein)}<br><small>${meal.lunch.note}</small></p>
-      <p><b>Svačina:</b> ${meal.snack.name} ${proteinBadge(meal.snack.protein)}<br><small>${meal.snack.note}</small></p>
-      <p><b>Večeře:</b> ${meal.dinner.name} ${proteinBadge(meal.dinner.protein)}<br><small>${meal.dinner.note}</small></p>
+      ${renderDayMealWithAlternatives(meal.lunch, "Oběd", index, "lunch")}
+      ${renderDayMealWithAlternatives(meal.snack, "Svačina", index, "snack")}
+      ${renderDayMealWithAlternatives(meal.dinner, "Večeře", index, "dinner")}
       <p>${item.note}</p>
     </aside>
+  `;
+}
+
+function renderDayMealWithAlternatives(meal, label, dayIndex, type) {
+  const alternatives = getMealAlternatives(meal, dayIndex, type);
+  return `
+    <div class="day-meal-block">
+      <p><b>${label}:</b> ${meal.name} ${proteinBadge(meal.protein)}<br><small>${meal.note}</small></p>
+      <details>
+        <summary>Vyměnit za podobné</summary>
+        <ul class="clean-list">
+          ${alternatives.map((item) => `<li>${item.name} ${proteinBadge(item.protein)}</li>`).join("")}
+        </ul>
+      </details>
+    </div>
   `;
 }
 
@@ -1045,6 +1348,10 @@ function renderMeals() {
     <article class="meal-card">
       <span class="pill ${item.type}">${item.day}</span>
       <h3>${item.label}</h3>
+      <div class="meal-card-meta">
+        <span>${getMealForDay(index).lunch.protein + getMealForDay(index).snack.protein + getMealForDay(index).dinner.protein} g bílkovin</span>
+        <span>${getTrainingRisk(item).label}</span>
+      </div>
       ${renderMealBlock(getMealForDay(index).lunch, "Oběd")}
       ${renderMealBlock(getMealForDay(index).snack, "Svačina")}
       ${renderMealBlock(getMealForDay(index).dinner, "Večeře")}
@@ -1830,8 +2137,10 @@ function bindCheckin() {
 renderMetrics();
 renderWeeklyComparison();
 renderMealWeekSelect();
+renderTodayCoach();
 bindMealWeekSelect();
 renderDayTabs();
+renderMealPrep();
 renderMeals();
 renderRecipes();
 applyRecipesVisibility();
@@ -1840,5 +2149,6 @@ bindRecipeFilters();
 initShopping();
 initSupplements();
 bindCheckin();
+renderImportProtocol();
 renderGarminMetrics();
 renderHistory();

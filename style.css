@@ -184,6 +184,91 @@ main { width: min(1180px, calc(100% - 32px)); margin: 0 auto 56px; }
   min-width: 760px;
 }
 
+.today-grid, .coach-layout {
+  display: grid;
+  gap: 14px;
+}
+.today-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+.coach-layout {
+  grid-template-columns: 0.85fr 1.05fr 1fr;
+}
+.today-card {
+  background: rgba(255,255,255,0.92);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.today-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(18,103,216,0.22);
+}
+.today-card h3 {
+  margin: 12px 0 8px;
+  font-size: 1.1rem;
+}
+.today-card p {
+  color: var(--muted);
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+.mini-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+.mini-meta span {
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: #244d85;
+  padding: 7px 10px;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+.score-ring {
+  --score: 70;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 16px 0;
+  background:
+    radial-gradient(circle at center, #fff 0 55%, transparent 56%),
+    conic-gradient(var(--blue) calc(var(--score) * 1%), #e7edf6 0);
+}
+.score-ring.warn {
+  background:
+    radial-gradient(circle at center, #fff 0 55%, transparent 56%),
+    conic-gradient(var(--orange) calc(var(--score) * 1%), #e7edf6 0);
+}
+.score-ring.alert {
+  background:
+    radial-gradient(circle at center, #fff 0 55%, transparent 56%),
+    conic-gradient(var(--red) calc(var(--score) * 1%), #e7edf6 0);
+}
+.score-ring strong,
+.score-ring span {
+  grid-area: 1 / 1;
+}
+.score-ring strong {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+.score-ring span {
+  align-self: end;
+  margin-bottom: 34px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
 .goal-grid, .two-column, .checkin-layout {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -231,6 +316,19 @@ main { width: min(1180px, calc(100% - 32px)); margin: 0 auto 56px; }
 .day-detail h3 { margin: 10px 0; font-size: 1.45rem; }
 .day-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
 .focus-box { background: var(--blue-soft); border: 1px solid rgba(18,103,216,0.12); border-radius: 14px; padding: 16px; }
+.risk-box {
+  display: grid;
+  gap: 5px;
+  margin-top: 12px;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  background: #f8fbff;
+}
+.risk-box.good { border-color: rgba(18,103,216,0.22); background: rgba(18,103,216,0.08); color: var(--ink); }
+.risk-box.warn { border-color: rgba(223,132,44,0.26); background: rgba(223,132,44,0.11); color: var(--ink); }
+.risk-box.alert { border-color: rgba(201,83,83,0.24); background: rgba(201,83,83,0.09); color: var(--ink); }
+.risk-box small { color: var(--muted); }
 
 .nutrition-strip {
   display: grid;
@@ -287,6 +385,20 @@ main { width: min(1180px, calc(100% - 32px)); margin: 0 auto 56px; }
 .meal-card h3, .recipe-card h3 { margin: 0 0 12px; }
 .meal-card p, .recipe-card p { color: var(--muted); line-height: 1.55; }
 .meal-card b { color: var(--ink); }
+.meal-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 10px;
+}
+.meal-card-meta span {
+  color: var(--muted);
+  background: #f1f6fc;
+  border-radius: 999px;
+  padding: 6px 9px;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
 .meal-line {
   display: grid;
   gap: 6px;
@@ -323,6 +435,43 @@ main { width: min(1180px, calc(100% - 32px)); margin: 0 auto 56px; }
 .protein-low {
   background: rgba(223,132,44,0.15);
   color: #9b5617;
+}
+.day-meal-block {
+  border-bottom: 1px solid var(--line);
+  padding: 0 0 10px;
+  margin-bottom: 10px;
+}
+.day-meal-block details {
+  border-radius: 12px;
+  background: #f8fbff;
+  border: 1px solid var(--line);
+  padding: 10px 12px;
+}
+.day-meal-block summary {
+  cursor: pointer;
+  color: var(--blue);
+  font-weight: 850;
+}
+
+.meal-prep-card {
+  margin-bottom: 18px;
+}
+.meal-prep-head h3 {
+  margin: 12px 0 6px;
+}
+.meal-prep-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.meal-prep-grid > div {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f8fbff;
+  padding: 14px;
+}
+.meal-prep-grid h4 {
+  margin: 0 0 8px;
 }
 
 .accent-card { border-color: rgba(18,103,216,0.24); }
@@ -761,6 +910,31 @@ textarea { resize: vertical; margin-bottom: 14px; }
 }
 
 .history-wrap { padding: 18px; overflow: hidden; }
+.import-protocol {
+  margin-bottom: 18px;
+}
+.import-card h3 {
+  margin: 12px 0 8px;
+}
+.protocol-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.protocol-steps span {
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--blue-soft);
+  color: #244d85;
+  font-weight: 850;
+  text-align: center;
+  padding: 0 10px;
+}
 canvas { width: 100%; max-height: 260px; display: block; }
 .table-scroll { overflow-x: auto; margin-top: 16px; }
 table { border-collapse: collapse; width: 100%; min-width: 880px; background: #fff; }
@@ -815,16 +989,17 @@ th { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-
 }
 
 @media (max-width: 900px) {
-  .hero-grid, .day-detail, .goal-grid, .two-column, .checkin-layout, .supplement-shell, .shopping-layout, .next-shopping-list, .weekly-comparison-layout { grid-template-columns: 1fr; }
-  .metrics-grid, .meal-grid, .recipe-grid, .supplement-weekly, .garmin-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero-grid, .day-detail, .goal-grid, .two-column, .checkin-layout, .supplement-shell, .shopping-layout, .next-shopping-list, .weekly-comparison-layout, .coach-layout, .meal-prep-grid { grid-template-columns: 1fr; }
+  .metrics-grid, .meal-grid, .recipe-grid, .supplement-weekly, .garmin-summary-grid, .today-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .nutrition-strip { grid-template-columns: 1fr; }
+  .protocol-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 620px) {
   main, .hero { width: min(100% - 20px, 1180px); padding-left: 0; padding-right: 0; }
   .topbar { align-items: flex-start; flex-direction: column; }
   .hero h1 { font-size: 2.35rem; }
-  .metrics-grid, .meal-grid, .recipe-grid, .form-grid, .supplement-grid, .supplement-fields, .supplement-weekly, .shopping-category > div, .garmin-summary-grid { grid-template-columns: 1fr; }
+  .metrics-grid, .meal-grid, .recipe-grid, .form-grid, .supplement-grid, .supplement-fields, .supplement-weekly, .shopping-category > div, .garmin-summary-grid, .today-grid, .protocol-steps { grid-template-columns: 1fr; }
   .inline-heading, .supplement-heading, .meal-rotation-toolbar { align-items: flex-start; flex-direction: column; }
   .visibility-toggles, .toggle-row { width: 100%; }
   .visibility-toggles { justify-content: stretch; }
