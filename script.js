@@ -921,6 +921,44 @@ function getNutritionScore() {
   return { score, tone, notes, stats };
 }
 
+function getNutritionFixes(nutrition) {
+  const fixes = [];
+  const gap = Math.max(0, 120 - nutrition.stats.average);
+  if (gap > 0) {
+    fixes.push(`Přidej v týdnu 1 skyr nebo tvaroh ve ${nutrition.stats.lowDays[0]?.day || "dni s nižším příjmem"} a 1 protein po tréninku. Dorovnáš zhruba ${gap} g/den.`);
+  }
+  if (nutrition.stats.lowDays.length > 1) {
+    fixes.push(`Nízké proteinové dny: ${nutrition.stats.lowDays.map((item) => item.day).join(", ")}. Tam plánuj svačinu předem.`);
+  }
+  fixes.push("U restaurace drž jednoduché pravidlo: bílkovina + příloha + zelenina, omáčka bokem.");
+  fixes.push("Řízené sladké nech jako plánovanou variantu, ne jako večerní improvizaci.");
+  return fixes.slice(0, 4);
+}
+
+function getWeeklySystemScore(readiness, nutrition) {
+  const current = getCurrentWeeklyValues();
+  let score = Math.round((readiness.score * 0.45) + (nutrition.score * 0.35));
+  if (current.stepsAverage >= 10000 && current.stepsAverage <= 15000) score += 6;
+  if (current.stress <= 23) score += 5;
+  if (current.sleepMinutes >= 440) score += 4;
+  if (current.hrv >= 38) score += 5;
+  score = Math.max(0, Math.min(100, score));
+  const tone = score >= 80 ? "good" : score >= 65 ? "warn" : "alert";
+  const label = score >= 80 ? "Silný týden" : score >= 65 ? "Dobrý základ" : "Týden k uhlazení";
+  return { score, tone, label };
+}
+
+function getKeepDoingNotes(readiness, nutrition) {
+  const notes = [];
+  const current = getCurrentWeeklyValues();
+  if (current.stress <= 23) notes.push("Nízký stres funguje. Nerozbíjet ho extra intenzitou.");
+  if (current.stepsAverage >= 12000) notes.push("Kroky jsou silná stránka. Ve čtvrtek je jen vědomě kroť.");
+  if (readiness.score >= 78) notes.push("Regenerační signály jsou dobré. Drž systém, nepřidávej chaos.");
+  if (nutrition.stats.average >= 110) notes.push("Jídelní plán má bílkovinný základ. Stačí ho lehce dorovnat, ne překopat.");
+  notes.push("Fotbal dál počítat jako tvrdý trénink, ne jako volnou aktivitu.");
+  return notes.slice(0, 4);
+}
+
 function getMealAlternatives(meal, dayIndex, type) {
   const allMeals = mealRotationWeeks.flatMap((week) => week.meals.map((dayMeals) => dayMeals[type]));
   const lower = meal.name.toLowerCase();
@@ -946,6 +984,11 @@ function formatTodayLabel() {
   return new Intl.DateTimeFormat("cs-CZ", { weekday: "long", day: "numeric", month: "numeric" }).format(new Date());
 }
 
+function isPantryCheckItem(item) {
+  return ["Dochucení", "Suplementy", "Luštěniny a konzervy"].includes(item.category)
+    || /zásoba|průběžně|hlídat/.test(`${item.amount} ${item.frequency}`);
+}
+
 function renderMetrics() {
   $("#metrics").innerHTML = metrics.map(([name, value, text]) => `
     <article class="metric-card">
@@ -963,7 +1006,12 @@ function renderTodayCoach() {
   const readiness = getReadiness();
   const risk = getTrainingRisk(day);
   const nutrition = getNutritionScore();
+  const nutritionFixes = getNutritionFixes(nutrition);
+  const weekScore = getWeeklySystemScore(readiness, nutrition);
+  const keepDoing = getKeepDoingNotes(readiness, nutrition);
   const supplementPlan = getDaySupplementPlan(todayIndex);
+  const shopping = buildNextWeekShoppingList();
+  const buyNow = shopping.items.filter((item) => !isPantryCheckItem(item)).slice(0, 4);
 
   $("#todayGrid").innerHTML = `
     <article class="today-card">
@@ -988,6 +1036,12 @@ function renderTodayCoach() {
       <p>${supplementPlan.slice(0, 5).map((item) => item.name).join(", ")}${supplementPlan.length > 5 ? "..." : ""}</p>
       <p class="muted-text">Detail je schovaný pod přepínačem v sekci Suplementace.</p>
     </article>
+    <article class="today-card">
+      <span class="pill neutral">Nákupní priorita</span>
+      <h3>${buyNow.length} věci koupit čerstvé</h3>
+      <p>${buyNow.map((item) => item.name).join(", ")}</p>
+      <p class="muted-text">Zbytek je níž rozdělený na koupit a zkontrolovat doma.</p>
+    </article>
   `;
 
   $("#readinessCard").innerHTML = `
@@ -998,6 +1052,7 @@ function renderTodayCoach() {
       <span>${readiness.label}</span>
     </div>
     <p>${readiness.advice}</p>
+    <p class="muted-text">Odhad podle posledního nahraného týdne Garmin dat. Po nových screenshotech se přepočítá.</p>
     <ul class="clean-list">${readiness.reasons.slice(0, 4).map((reason) => `<li>${reason}</li>`).join("")}</ul>
   `;
 
@@ -1007,9 +1062,11 @@ function renderTodayCoach() {
     <ul class="clean-list">
       <li>${risk.advice}</li>
       <li>${readiness.score >= 78 ? "Drž silový plán 3x týdně a fotbal dál počítej jako tvrdou intenzitu." : "Volitelný výklus škrtni, dokud se nezvedne spánek nebo pocit energie."}</li>
-      <li>${nutrition.stats.lowDays.length ? "U dnů s nižším proteinem přidej skyr, tvaroh nebo půl až jednu odměrku proteinu." : "Proteinový základ týdne je připravený dobře."}</li>
+      <li>${nutritionFixes[0]}</li>
       <li>Čtvrtek nech opravdu volnější. Tady se kupuje lepší pátek a víkend.</li>
     </ul>
+    <h4>Co neměnit</h4>
+    <ul class="clean-list">${keepDoing.map((note) => `<li>${note}</li>`).join("")}</ul>
   `;
 
   $("#nutritionScoreCard").innerHTML = `
@@ -1018,6 +1075,19 @@ function renderTodayCoach() {
     <div class="mini-progress"><div><i style="width:${nutrition.score}%"></i></div></div>
     <p><b>Průměr:</b> ${nutrition.stats.average} g bílkovin denně v aktuální rotaci.</p>
     <ul class="clean-list">${nutrition.notes.slice(0, 4).map((note) => `<li>${note}</li>`).join("")}</ul>
+    <h4>Rychlá oprava</h4>
+    <ul class="clean-list">${nutritionFixes.map((fix) => `<li>${fix}</li>`).join("")}</ul>
+  `;
+
+  $("#weekScoreCard").innerHTML = `
+    <span class="pill ${weekScore.tone}">Skóre režimu týdne</span>
+    <h3>${weekScore.label}: ${weekScore.score}/100</h3>
+    <div class="mini-progress"><div><i style="width:${weekScore.score}%"></i></div></div>
+    <p>Jedno číslo pro orientaci: readiness, výživa, stres, kroky, spánek a HRV. Není to známka, jen kompas.</p>
+    <ul class="clean-list">
+      <li>Největší páka teď: ${nutrition.stats.average < 120 ? "lehce dorovnat bílkoviny." : "držet stabilní jídla."}</li>
+      <li>${readiness.score >= 78 ? "Regenerace vypadá použitelně." : "Regeneraci dej přednost před přidáváním objemu."}</li>
+    </ul>
   `;
 }
 
@@ -1069,6 +1139,23 @@ function renderImportProtocol() {
         <span>2. Kontrola hodnot</span>
         <span>3. Zápis do kódu</span>
         <span>4. Trendy a doporučení</span>
+      </div>
+      <div class="protocol-table" role="table" aria-label="Stav importu měření">
+        <div role="row">
+          <strong role="cell">Garmin screenshoty</strong>
+          <span role="cell">Zapsáno</span>
+          <em role="cell">${report.period}</em>
+        </div>
+        <div role="row">
+          <strong role="cell">Váha</strong>
+          <span role="cell">Čeká na pondělí</span>
+          <em role="cell">Doplníš při check-inu</em>
+        </div>
+        <div role="row">
+          <strong role="cell">Pas</strong>
+          <span role="cell">Čeká na pondělí</span>
+          <em role="cell">Důležité pro rekompozici</em>
+        </div>
       </div>
       <p class="muted-text">Poslední nahrané období: ${report.period}. Váha a pas zůstávají pro pondělní check-in.</p>
     </article>
@@ -1589,32 +1676,49 @@ function renderNextWeekShoppingList() {
   const weekKey = getPlannedShoppingKey(week);
   const checked = state[weekKey] || {};
   const checkedCount = items.filter((item) => checked[item.id]).length;
-  summary.textContent = `${week.title}. Odškrtnuto ${checkedCount}/${items.length}. Jen suroviny z jídel tohoto vybraného týdne.`;
+  const buyItems = items.filter((item) => !isPantryCheckItem(item));
+  const pantryItems = items.filter(isPantryCheckItem);
+  summary.textContent = `${week.title}. Odškrtnuto ${checkedCount}/${items.length}. Koupit ${buyItems.length}, doma zkontrolovat ${pantryItems.length}.`;
 
-  target.innerHTML = shoppingCategories
-    .filter((category) => category !== "Vše")
-    .map((category) => {
-      const categoryItems = items.filter((item) => item.category === category);
-      if (!categoryItems.length) return "";
-      return `
-        <section class="next-shopping-category">
-          <h4>${category}</h4>
-          <div>
-            ${categoryItems.map((item) => `
-              <label class="next-shopping-item ${checked[item.id] ? "done" : ""}">
-                <input type="checkbox" data-planned-shopping-id="${item.id}" ${checked[item.id] ? "checked" : ""} />
-                <span>
-                  <strong>${item.name}</strong>
-                  <small>${item.amount || "dle potřeby"} · ${item.frequency || "průběžně"} · ${item.count}× v plánu</small>
-                  <p>${item.note || ""}</p>
-                  <em>${item.uses.slice(0, 2).join("<br>")}${item.uses.length > 2 ? "<br>+ další jídla v týdnu" : ""}</em>
-                </span>
-              </label>
-            `).join("")}
-          </div>
-        </section>
-      `;
-    }).join("");
+  target.innerHTML = `
+    ${renderPlannedShoppingColumn("Koupit tento týden", "Věci, které pravděpodobně dojdou nebo mají být čerstvé.", buyItems, checked)}
+    ${renderPlannedShoppingColumn("Zkontrolovat doma", "Spíž, dochucení, konzervy a suplementy. Kup jen když dochází.", pantryItems, checked)}
+  `;
+}
+
+function renderPlannedShoppingColumn(title, description, items, checked) {
+  return `
+    <section class="next-shopping-column">
+      <div class="next-shopping-column-head">
+        <h4>${title}</h4>
+        <p>${description}</p>
+      </div>
+      ${shoppingCategories
+        .filter((category) => category !== "Vše")
+        .map((category) => {
+          const categoryItems = items.filter((item) => item.category === category);
+          if (!categoryItems.length) return "";
+          return `
+            <section class="next-shopping-category">
+              <h5>${category}</h5>
+              <div>
+                ${categoryItems.map((item) => `
+                  <label class="next-shopping-item ${checked[item.id] ? "done" : ""}">
+                    <input type="checkbox" data-planned-shopping-id="${item.id}" ${checked[item.id] ? "checked" : ""} />
+                    <span>
+                      <strong>${item.name}</strong>
+                      <small>${item.amount || "dle potřeby"} · ${item.frequency || "průběžně"} · ${item.count}× v plánu</small>
+                      <p>${item.note || ""}</p>
+                      <em>${item.uses.slice(0, 2).join("<br>")}${item.uses.length > 2 ? "<br>+ další jídla v týdnu" : ""}</em>
+                    </span>
+                  </label>
+                `).join("")}
+              </div>
+            </section>
+          `;
+        }).join("")}
+    </section>
+  `;
 }
 
 function initShopping() {

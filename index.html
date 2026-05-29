@@ -11,9 +11,9 @@
       <nav class="topbar" aria-label="Hlavní navigace">
         <strong>Tomášův dashboard</strong>
         <div>
+          <a href="#dnes">Dnes</a>
           <a href="#trenink">Trénink</a>
           <a href="#jidlo">Jídlo</a>
-          <a href="#dnes">Dnes</a>
           <a href="#nakup">Nákup</a>
           <a href="#suplementace">Suplementace</a>
           <a href="#checkin">Check-in</a>
@@ -30,7 +30,7 @@
           </p>
           <div class="hero-actions">
             <a class="button primary" href="#checkin">Zapsat pondělní check-in</a>
-            <a class="button secondary" href="#plan">Zobrazit týden</a>
+            <a class="button secondary" href="#dnes">Dnešní cockpit</a>
           </div>
         </section>
         <aside class="hero-panel">
@@ -46,7 +46,21 @@
     </header>
 
     <main>
-      <section class="section">
+      <section class="section cockpit-section" id="dnes">
+        <div class="section-heading">
+          <p class="eyebrow">Dnes a koučink</p>
+          <h2>Rychlé rozhodnutí bez přemýšlení navíc</h2>
+        </div>
+        <div id="todayGrid" class="today-grid"></div>
+        <div class="coach-layout">
+          <article id="readinessCard" class="card readiness-card"></article>
+          <article id="coachBriefing" class="card coach-card"></article>
+          <article id="nutritionScoreCard" class="card nutrition-score-card"></article>
+          <article id="weekScoreCard" class="card week-score-card"></article>
+        </div>
+      </section>
+
+      <section class="section metrics-section">
         <div class="section-heading">
           <p class="eyebrow">Aktuální hodnoty</p>
           <h2>Kontrolky režimu</h2>
@@ -65,36 +79,26 @@
         </div>
       </section>
 
-      <section class="section" id="dnes">
-        <div class="section-heading">
-          <p class="eyebrow">Dnes a koučink</p>
-          <h2>Rychlé rozhodnutí bez přemýšlení navíc</h2>
-        </div>
-        <div id="todayGrid" class="today-grid"></div>
-        <div class="coach-layout">
-          <article id="readinessCard" class="card readiness-card"></article>
-          <article id="coachBriefing" class="card coach-card"></article>
-          <article id="nutritionScoreCard" class="card nutrition-score-card"></article>
-        </div>
-      </section>
-
       <section class="section goals" id="plan">
         <div class="section-heading">
           <p class="eyebrow">Směr na 8 až 12 týdnů</p>
           <h2>Cíl není menší tělo, ale lepší systém</h2>
         </div>
-        <div class="goal-grid">
-          <article class="card">
-            <span class="pill good">Realistický cíl</span>
-            <h3>79 až 80 kg, pas dolů o 2 až 4 cm</h3>
-            <p>Zachovat sílu, stabilizovat HRV, držet energii a nepřidávat intenzitu jen proto, že zrovna zbylo místo v kalendáři.</p>
-          </article>
-          <article class="card">
-            <span class="pill warn">Ambiciózní cíl</span>
-            <h3>77 až 78 kg jen při dobré odezvě těla</h3>
-            <p>Jít níž dává smysl pouze tehdy, pokud neklesá výkon, chuť do tréninku, spánek ani regenerace.</p>
-          </article>
-        </div>
+        <details class="section-collapse">
+          <summary>Zobrazit cíle a mantinely</summary>
+          <div class="goal-grid">
+            <article class="card">
+              <span class="pill good">Realistický cíl</span>
+              <h3>79 až 80 kg, pas dolů o 2 až 4 cm</h3>
+              <p>Zachovat sílu, stabilizovat HRV, držet energii a nepřidávat intenzitu jen proto, že zrovna zbylo místo v kalendáři.</p>
+            </article>
+            <article class="card">
+              <span class="pill warn">Ambiciózní cíl</span>
+              <h3>77 až 78 kg jen při dobré odezvě těla</h3>
+              <p>Jít níž dává smysl pouze tehdy, pokud neklesá výkon, chuť do tréninku, spánek ani regenerace.</p>
+            </article>
+          </div>
+        </details>
       </section>
 
       <section class="section" id="trenink">
@@ -319,25 +323,28 @@
         </div>
         <div id="importProtocol" class="import-protocol"></div>
         <div id="garminSummary" class="garmin-summary-grid"></div>
-        <div class="history-wrap garmin-table-wrap">
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Datum</th>
-                  <th>Spánek</th>
-                  <th>HRV</th>
-                  <th>Tep</th>
-                  <th>Stres</th>
-                  <th>Body Battery</th>
-                  <th>SpO2</th>
-                  <th>Kalorie</th>
-                </tr>
-              </thead>
-              <tbody id="garminDailyBody"></tbody>
-            </table>
+        <details class="section-collapse">
+          <summary>Zobrazit denní Garmin tabulku</summary>
+          <div class="history-wrap garmin-table-wrap">
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Datum</th>
+                    <th>Spánek</th>
+                    <th>HRV</th>
+                    <th>Tep</th>
+                    <th>Stres</th>
+                    <th>Body Battery</th>
+                    <th>SpO2</th>
+                    <th>Kalorie</th>
+                  </tr>
+                </thead>
+                <tbody id="garminDailyBody"></tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </details>
       </section>
 
       <section class="section">
@@ -348,27 +355,30 @@
           </div>
           <button id="clearHistory" class="button danger" type="button">Smazat historii</button>
         </div>
-        <div class="history-wrap">
-          <canvas id="trendChart" width="900" height="260" aria-label="Graf vývoje"></canvas>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th>Datum</th>
-                  <th>Váha</th>
-                  <th>Pas</th>
-                  <th>HRV</th>
-                  <th>Tep</th>
-                  <th>Spánek</th>
-                  <th>Energie</th>
-                  <th>Chutě</th>
-                  <th>Poznámka</th>
-                </tr>
-              </thead>
-              <tbody id="historyBody"></tbody>
-            </table>
+        <details class="section-collapse">
+          <summary>Zobrazit graf a tabulku historie</summary>
+          <div class="history-wrap">
+            <canvas id="trendChart" width="900" height="260" aria-label="Graf vývoje"></canvas>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Datum</th>
+                    <th>Váha</th>
+                    <th>Pas</th>
+                    <th>HRV</th>
+                    <th>Tep</th>
+                    <th>Spánek</th>
+                    <th>Energie</th>
+                    <th>Chutě</th>
+                    <th>Poznámka</th>
+                  </tr>
+                </thead>
+                <tbody id="historyBody"></tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </details>
       </section>
 
       <section class="section final-note">
